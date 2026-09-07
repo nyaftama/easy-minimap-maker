@@ -1,0 +1,561 @@
+/* ============================================================
+   easy-minimap-maker - timeline.css
+   動画編集ソフト風 横長タイムラインエディタ
+   ============================================================ */
+
+.workspace-bottom {
+    height: 240px;
+    min-height: 180px;
+    max-height: 45vh;
+    background: #181b22;
+    border-top: 2px solid #2d3340;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    user-select: none;
+    position: relative;
+    z-index: 5;
+}
+
+/* タイムラインツールバー */
+.timeline-toolbar {
+    height: 42px;
+    background: #20242e;
+    border-bottom: 1px solid #2d3340;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.timeline-tools-left {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.timeline-tools-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timeline-tools-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ツールボタングループ (矢印、前方選択、後方選択、範囲選択) */
+.tool-btn-group {
+    display: flex;
+    background: #14171d;
+    border: 1px solid #2d3340;
+    border-radius: var(--radius-sm);
+    padding: 2px;
+    gap: 2px;
+}
+
+.btn-tool {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 5px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    position: relative;
+}
+
+.btn-tool:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-tool.active {
+    background: var(--primary-color);
+    color: #ffffff;
+}
+
+.btn-tool svg {
+    width: 15px;
+    height: 15px;
+}
+
+/* 一時停止ボタン（通常時は「一時停止を開始」、開始後は「一時停止を終了」でハイライト） */
+.btn-pause-mode {
+    background: #2d3340;
+    color: #e2e8f0;
+    border: 1px solid #475569;
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition);
+}
+
+.btn-pause-mode:hover:not(:disabled) {
+    background: #3a4252;
+}
+
+.btn-pause-mode:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.btn-pause-mode.active-pausing {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #ef4444;
+    animation: pause-btn-blink 1.5s infinite;
+}
+
+@keyframes pause-btn-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.75; }
+}
+
+/* 一時停止作成中のタイムライン操作ロック */
+.track-lane.pausing-locked {
+    cursor: default !important;
+}
+
+.track-lane.pausing-locked .kf-marker {
+    cursor: not-allowed !important;
+    opacity: 0.65;
+}
+
+.track-lane.pausing-locked .timeline-pause-band {
+    cursor: not-allowed !important;
+    opacity: 0.65;
+}
+
+.btn-tool:disabled {
+    opacity: 0.35 !important;
+    cursor: not-allowed !important;
+}
+
+.btn-kf-nav:disabled {
+    opacity: 0.35 !important;
+    cursor: not-allowed !important;
+}
+
+/* タイムラインズームスライダー */
+.timeline-zoom-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.zoom-slider {
+    width: 90px;
+    height: 4px;
+    -webkit-appearance: none;
+    background: #2d3340;
+    border-radius: 2px;
+    outline: none;
+}
+
+.zoom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #60a5fa;
+    cursor: pointer;
+}
+
+/* タイムラインスクロール・トラックスペース */
+.timeline-viewport {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    background: #14171e;
+    cursor: default;
+}
+
+.timeline-content {
+    height: 100%;
+    position: relative;
+    min-width: 100%;
+}
+
+/* 時間ルーラー (Time Ruler) */
+.timeline-ruler {
+    height: 28px;
+    background: #1a1e27;
+    border-bottom: 1px solid #2d3340;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+    touch-action: none; /* スマホでのタッチスクロール競合を防止 */
+}
+
+.ruler-ticks-canvas {
+    position: sticky;
+    top: 0;
+    left: 0;
+    height: 100%;
+    pointer-events: none;
+    display: block;
+}
+
+/* 再生ヘッド (Playhead) */
+.playhead-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    z-index: 50;
+    pointer-events: none;
+    transform: translateX(0px);
+}
+
+.playhead-head {
+    position: absolute;
+    top: 0;
+    left: -8px;
+    width: 17px;
+    height: 18px;
+    background: #ef4444;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 50% 100%, 0% 60%);
+    cursor: ew-resize;
+    pointer-events: auto;
+    z-index: 52;
+    touch-action: none; /* スマホでのタッチスクロール競合を防止 */
+}
+
+/* タップ・ドラッグ用の判定エリアを上下左右に拡張 */
+.playhead-head::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    bottom: -16px;
+    left: -14px;
+    right: -14px;
+    cursor: ew-resize;
+}
+
+.playhead-line {
+    position: absolute;
+    top: 16px;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    background: #ef4444;
+    pointer-events: none;
+    z-index: 51;
+}
+
+/* キーフレームトラック */
+.timeline-track-lane {
+    position: relative;
+    height: calc(100% - 28px);
+    width: 100%;
+    background: #14171e;
+}
+
+.track-grid-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* 一時停止区間帯 (Pause Band) */
+.timeline-pause-band {
+    position: absolute;
+    top: 15%;
+    height: 70%;
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(239, 68, 68, 0.25),
+        rgba(239, 68, 68, 0.25) 8px,
+        rgba(220, 38, 38, 0.45) 8px,
+        rgba(220, 38, 38, 0.45) 16px
+    );
+    border: 1px solid #ef4444;
+    border-radius: var(--radius-sm);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fca5a5;
+    font-size: 10px;
+    font-weight: 700;
+    overflow: hidden;
+    white-space: nowrap;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* キーフレームマーカー (Keyframe Marker) */
+.kf-marker {
+    position: absolute;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    margin-top: -8px;
+    background: #3b82f6;
+    border: 2px solid #ffffff;
+    border-radius: 2px;
+    transform: rotate(45deg);
+    cursor: pointer;
+    z-index: 20;
+    transition: transform 0.1s ease, background 0.1s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.kf-marker:hover {
+    background: #60a5fa;
+    transform: rotate(45deg) scale(1.25);
+}
+
+.kf-marker.selected {
+    background: #f59e0b;
+    border-color: #ffffff;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.9);
+    transform: rotate(45deg) scale(1.3);
+}
+
+.kf-marker.pause-marker {
+    background: #ef4444;
+}
+
+.kf-marker.pause-marker.selected {
+    background: #f97316;
+}
+
+/* 範囲選択マーキー矩形 (Marquee Selection Box) */
+.timeline-marquee-box {
+    position: absolute;
+    border: 1px dashed #60a5fa;
+    background: rgba(59, 130, 246, 0.2);
+    pointer-events: none;
+    z-index: 40;
+    display: none;
+}
+
+/* キーフレーム情報ポップオーバー・ツールチップ */
+.kf-tooltip {
+    position: absolute;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid #334155;
+    color: #f8fafc;
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+    z-index: 100;
+    white-space: nowrap;
+    transform: translate(-50%, -130%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+
+
+/* デスクトップ表示での Undo / Redo ボタンの高さ最適化 (他ボタンと30pxに統一) */
+.timeline-toolbar #btnUndo,
+.timeline-toolbar #btnRedo {
+    height: 30px;
+    min-height: 30px;
+    min-width: 32px;
+    padding: 0 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #2d3340;
+    color: #e2e8f0;
+    border: 1px solid #475569;
+    border-radius: var(--radius-sm);
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.timeline-toolbar #btnUndo:hover:not(:disabled),
+.timeline-toolbar #btnRedo:hover:not(:disabled) {
+    background: #3a4252;
+    color: #ffffff;
+    border-color: #64748b;
+}
+
+.timeline-toolbar #btnUndo:disabled,
+.timeline-toolbar #btnRedo:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.timeline-toolbar #btnUndo svg,
+.timeline-toolbar #btnRedo svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* タイムラインツールバー: キーフレーム削除ボタン (警告アクションとして赤色ベース) */
+.btn-delete-kf {
+    height: 30px;
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #dc2626;
+    color: #ffffff;
+    border: 1px solid #ef4444;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+}
+
+.btn-delete-kf:hover:not(:disabled) {
+    background: #b91c1c;
+    color: #ffffff;
+    border-color: #dc2626;
+}
+
+.btn-delete-kf:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #ef4444;
+}
+
+.btn-delete-kf svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+}
+
+/* レスポンシブ: スマートフォン表示でズームコントロールを確実に非表示 */
+
+/* タイムラインメイン領域 (左側固定ナビ余白 + スクロールビューポート) */
+.timeline-main-area {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* 固定左ナビサイドバー: 余白 & 前後キーフレーム移動ボタン (↑/↓) */
+.timeline-nav-sidebar {
+    width: 46px;
+    background: #181c24;
+    border-right: 1px solid #2d3340;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 4px;
+    flex-shrink: 0;
+    z-index: 15;
+}
+
+.btn-kf-nav {
+    width: 36px;
+    height: 36px;
+    background: #202632;
+    border: 1px solid #334155;
+    border-radius: var(--radius-sm);
+    color: #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+    padding: 0;
+}
+
+.btn-kf-nav:hover {
+    background: #2d3748;
+    color: #ffffff;
+    border-color: #64748b;
+}
+
+.btn-kf-nav:active {
+    transform: scale(0.94);
+}
+
+.btn-kf-nav svg {
+    width: 14px;
+    height: 14px;
+}
+
+.kf-nav-sub {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #94a3b8;
+    line-height: 1;
+}
+
+.btn-kf-nav:hover .kf-nav-sub {
+    color: #ffffff;
+}
+
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+
+    /* スマホ表示ではタイムライン削除ボタンのテキストを非表示にしてアイコンのみコンパクト表示 */
+    .btn-delete-kf span {
+        display: none !important;
+    }
+    .btn-delete-kf {
+        padding: 0 8px;
+        min-width: 32px;
+        justify-content: center;
+    }
+
+    .timeline-nav-sidebar {
+        width: 38px;
+        padding: 4px 2px;
+        gap: 4px;
+    }
+    .btn-kf-nav {
+        width: 32px;
+        height: 32px;
+    }
+    .btn-kf-nav svg {
+        width: 13px;
+        height: 13px;
+    }
+    .kf-nav-sub {
+        display: none; /* スマホではアイコンのみでコンパクトに */
+    }
+
+    .timeline-zoom-control {
+        display: none !important;
+    }
+    .timeline-selection-popup {
+        top: 42px;
+        padding: 3px 4px 3px 10px;
+    }
+    .btn-popup-action {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}

@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2RNJ72H75W"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-2RNJ72H75W');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Prevent HTML Cache -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>かんたんミニマップメーカー | 街歩き・車載動画向け 現在地マップ作成ツール</title>
+    <meta name="description" content="OpenStreetMapの地図を用いた動画同期マップアニメーション（クロマキー素材）をブラウザ完結で作成できるツール。GPSロガーの情報も不要です。">
+
+    <meta property="og:title" content="かんたんミニマップメーカー">
+    <meta property="og:description" content="街歩き動画や車載動画のための現在地マップ動画素材（クロマキー）生成ツール。">
+    <meta property="og:type" content="website">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700;900&family=SF+Mono:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <!-- Application CSS -->
+    <link rel="stylesheet" href="css/style.css?v=0.92d">
+    <link rel="stylesheet" href="css/timeline.css?v=0.92d">
+</head>
+
+<body>
+
+    <!-- ============================================================
+         スタート画面 (案内・利用設定)
+         ============================================================ -->
+    <div id="startScreen" class="start-screen-container">
+        <div class="container">
+            <!-- Header Meta -->
+            <div class="header-meta">
+                <div class="version-group">
+                    <span class="version-badge">v0.92</span>
+                    <a href="https://github.com/nyaftama/easy-minimap-maker" target="_blank" rel="noopener noreferrer"
+                        class="changelog-link">GitHub</a>
+                </div>
+                <a href="https://nyaftama.github.io/" target="_blank" rel="noopener noreferrer" class="credit-link">
+                    作った人: <strong>@nyaftama</strong>
+                </a>
+            </div>
+
+            <!-- Title Header -->
+            <h1 class="main-title">
+                かんたんミニマップメーカー<br>
+                <span class="sub-title">街歩き・車載動画向け 現在地マップ作成ツール</span>
+            </h1>
+            <div class="eng-title">Easy Minimap Maker - GPS-Free Route Animator</div>
+
+            <!-- Tool Links -->
+            <div class="tool-links">
+                <a href="https://nyaftama.github.io/ar-banner-flag/" target="_blank" rel="noopener noreferrer"
+                    class="tool-link">
+                    <span>ARのぼり旗カメラ</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                </a>
+                <a href="https://nyaftama.github.io/uma-ouen-baken/" target="_blank" rel="noopener noreferrer"
+                    class="tool-link">
+                    <span>推しバ券メーカー</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                </a>
+                <a href="https://nyaftama.github.io/" target="_blank" rel="noopener noreferrer"
+                    class="tool-link-subtle">
+                    <span>すべて見る</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Card 1: プロジェクトを作成・再開 -->
+            <div class="card">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                    <span>プロジェクトを作成・再開</span>
+                </div>
+
+                <!-- プロジェクト再開バナー (自動保存データがある場合のみ表示) -->
+                <div id="restoreBanner" class="restore-banner" style="display: none;">
+                    <div class="restore-banner-text">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <polyline points="3 3 3 8 8 8"></polyline>
+                        </svg>
+                        <span><strong id="restoreProjectName">プロジェクト</strong> を再開しますか？</span>
+                    </div>
+                    <div class="restore-banner-actions">
+                        <button type="button" id="btnRestoreProject" class="btn btn-primary btn-sm">再開する</button>
+                        <button type="button" id="btnDiscardDraft" class="btn btn-secondary btn-sm">破棄</button>
+                    </div>
+                </div>
+
+                <!-- Dropzone Area -->
+                <div id="videoDropzone" class="dropzone">
+                    <input type="file" id="videoFileInput" accept="video/mp4,video/quicktime,video/webm"
+                        style="display: none;">
+                    <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                        <line x1="7" y1="2" x2="7" y2="22"></line>
+                        <line x1="17" y1="2" x2="17" y2="22"></line>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <line x1="2" y1="7" x2="7" y2="7"></line>
+                        <line x1="2" y1="17" x2="7" y2="17"></line>
+                        <line x1="17" y1="17" x2="22" y2="17"></line>
+                        <line x1="17" y1="7" x2="22" y2="7"></line>
+                    </svg>
+                    <div class="dropzone-title">動画ファイルを選択またはドラッグ＆ドロップ</div>
+                    <div class="dropzone-desc">対応形式: MP4, MOV, WebM</div>
+                    <button type="button" id="btnSelectVideo" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span>動画ファイルを選択</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 2: ツールの特徴 -->
+            <div class="card">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z">
+                        </path>
+                        <polyline points="9 12 11.5 14.5 15.5 9.5"></polyline>
+                    </svg>
+                    <span>ツールの特徴</span>
+                </div>
+
+                <div class="tool-features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>GPSログ不要</strong>
+                            <p>GPSロガーや位置情報データがなくても、動画を見ながら交差点や曲がり角で地図をタップするだけでルートを作成。区間は自動で滑らかに補間されます。</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="10" y1="15" x2="10" y2="9"></line>
+                                <line x1="14" y1="15" x2="14" y2="9"></line>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>信号待ち・立ち止まりに対応</strong>
+                            <p>「一時停止を開始／終了」の2タップで、動画が流れていても現在地がその場に留まる信号待ちや立ち寄り区間を自然に定義できます。</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                <line x1="7" y1="2" x2="7" y2="22"></line>
+                                <line x1="17" y1="2" x2="17" y2="22"></line>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <line x1="2" y1="7" x2="7" y2="7"></line>
+                                <line x1="2" y1="17" x2="7" y2="17"></line>
+                                <line x1="17" y1="17" x2="22" y2="17"></line>
+                                <line x1="17" y1="7" x2="22" y2="7"></line>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>クロマキー動画を一括出力</strong>
+                            <p>Adobe Premiere等のUltraキーで使える720x720のクロマキー動画を出力。縮尺スケールバーも自動描画されます。</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>GPX/GeoJSONの出力可能</strong>
+                            <p>作成したルートはクロマキー動画だけでなく、GPXやGeoJSONなどの標準位置情報フォーマットとしても一括保存できます。</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>多くのデバイスに対応</strong>
+                            <p>PCはもちろん、スマートフォンやタブレットのタッチ操作にも最適化。ピンチ操作によるタイムライン拡大にも対応します。</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>ローカル生成</strong>
+                            <p>動画ファイルや位置情報データはすべて端末内のブラウザで高速生成。サーバー等へアップロードされることは一切ありません。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer style="text-align: center; color: var(--text-muted-dark); font-size: 13px; margin-top: 24px;">
+                <p>&copy; 2026 nyaftama | 地図データ: &copy; OpenStreetMap contributors</p>
+            </footer>
+        </div>
+    </div>
+
+
+    <!-- ============================================================
+         メインワークスペース画面
+         ============================================================ -->
+    <div id="workspaceScreen" class="workspace-container" style="display: none;">
+
+        <!-- ワークスペース ヘッダーバー -->
+        <header class="workspace-header">
+            <div class="workspace-title-group">
+                <button type="button" id="btnBackToStart" class="btn btn-secondary btn-sm" title="スタート画面に戻る">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    <span>戻る</span>
+                </button>
+                <div class="project-name" id="projectNameDisplay">minimap-project</div>
+                <div class="auto-save-indicator" title="編集内容は自動保存されています">
+                    <span class="auto-save-dot"></span>
+                    <span id="autoSaveText">自動保存済み</span>
+                </div>
+            </div>
+
+            <div class="workspace-header-actions">
+                <button type="button" id="btnNewProject" class="btn btn-secondary btn-sm" title="新規プロジェクト">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                    <span>新規</span>
+                </button>
+                <button type="button" id="btnOpenSettings" class="btn btn-secondary btn-sm" title="設定">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                    <span>設定</span>
+                </button>
+                <button type="button" id="btnOpenExport" class="btn btn-accent btn-sm" title="クロマキー素材エクスポート">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>エクスポート</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- 上部ビューポート (左: 元動画プレビュー, 右: 地図プレビュー) -->
+        <div class="workspace-top">
+            <!-- 左ペイン: 元動画プレビュー -->
+            <div class="video-pane">
+                <div class="video-container">
+                    <video id="mainVideo" playsinline preload="auto"></video>
+
+                    <!-- 動画未読み込み時 / 復元時の中央ドロップエリア -->
+                    <div id="videoPlaceholderOverlay" class="video-placeholder-overlay" style="display: none;">
+                        <div class="video-placeholder-box" id="workspaceDropzone">
+                            <input type="file" id="workspaceVideoFileInput"
+                                accept="video/mp4,video/quicktime,video/webm" style="display: none;">
+                            <svg class="video-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                <line x1="7" y1="2" x2="7" y2="22"></line>
+                                <line x1="17" y1="2" x2="17" y2="22"></line>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <line x1="2" y1="7" x2="7" y2="7"></line>
+                                <line x1="2" y1="17" x2="7" y2="17"></line>
+                                <line x1="17" y1="17" x2="22" y2="17"></line>
+                                <line x1="17" y1="7" x2="22" y2="7"></line>
+                            </svg>
+                            <div class="video-placeholder-title">動画ファイルを選択またはドロップ</div>
+                            <div class="video-placeholder-sub">前回の編集データを復元しました。対象の動画ファイルを指定してください。</div>
+                            <div id="videoPlaceholderPrevName" class="video-placeholder-prevname"
+                                style="display: none;"></div>
+                            <button type="button" id="btnWorkspaceSelectVideo" class="btn btn-primary btn-sm">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span>動画ファイルを選択</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 動画下部コントローラー (タイムコード・ジョグ・ステップ送り) -->
+                <div class="video-control-bar">
+                    <div class="timecode-display">
+                        <span id="currentTimecode">00:00:00.00</span>
+                        <span class="timecode-total" id="totalTimecode"> / 00:00:00.00</span>
+                    </div>
+
+                    <!-- ジョグダイヤル・スクラバー -->
+                    <div class="jog-shuttle" id="jogShuttle" title="ドラッグで滑らかに前後スクラブ">
+                        <div class="jog-lines">
+                            <span class="jog-line"></span>
+                            <span class="jog-line"></span>
+                            <span class="jog-line"></span>
+                            <span class="jog-line center"></span>
+                            <span class="jog-line"></span>
+                            <span class="jog-line"></span>
+                            <span class="jog-line"></span>
+                        </div>
+                        <span class="jog-label">JOG SCRUB</span>
+                    </div>
+
+                    <!-- ステップ操作ボタン群 -->
+                    <div class="video-step-controls">
+                        <button type="button" id="btnStepBack5s" class="btn-ctrl" title="5秒戻る">-5s</button>
+                        <button type="button" id="btnStepBack1s" class="btn-ctrl" title="1秒戻る">-1s</button>
+                        <button type="button" id="btnStepBack1f" class="btn-ctrl" title="1フレーム戻る">-1f</button>
+                        <button type="button" id="btnPlayPause" class="btn-ctrl btn-play" title="再生 / 一時停止 (Space)">
+                            <svg id="playIcon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            <svg id="pauseIcon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"
+                                style="display: none;">
+                                <rect x="6" y="4" width="4" height="16"></rect>
+                                <rect x="14" y="4" width="4" height="16"></rect>
+                            </svg>
+                        </button>
+                        <button type="button" id="btnStepForward1f" class="btn-ctrl" title="1フレーム進む">+1f</button>
+                        <button type="button" id="btnStepForward1s" class="btn-ctrl" title="1秒進む">+1s</button>
+                        <button type="button" id="btnStepForward5s" class="btn-ctrl" title="5秒進む">+5s</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右ペイン: Leaflet OSM 地図プレビュー -->
+            <div class="map-pane">
+                <div class="map-header">
+                    <span style="font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                            <line x1="8" y1="2" x2="8" y2="18"></line>
+                            <line x1="16" y1="6" x2="16" y2="22"></line>
+                        </svg>
+                        <span>OpenStreetMap</span>
+                    </span>
+                    <div class="map-header-tools">
+                        <button type="button" id="btnFitBounds" class="btn btn-secondary btn-sm" title="全ルートを表示">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <polyline points="9 21 3 21 3 15"></polyline>
+                                <line x1="21" y1="3" x2="14" y2="10"></line>
+                                <line x1="3" y1="21" x2="10" y2="14"></line>
+                            </svg>
+                            <span>全体表示</span>
+                        </button>
+                        <button type="button" id="btnCenterCurrent" class="btn btn-secondary btn-sm" title="現在地に移動">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <span>現在地</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="map-container">
+                    <div id="leafletMap"></div>
+
+                    <!-- 地図フローティング検索バー -->
+                    <div class="map-search-bar" id="mapSearchBar">
+                        <div class="map-search-input-wrapper">
+                            <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" id="mapSearchInput" class="map-search-input"
+                                placeholder="地名・駅名・座標・URL..." autocomplete="off" spellcheck="false">
+                            <div class="map-search-spinner" id="mapSearchSpinner" style="display: none;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                    class="spinner-icon">
+                                    <line x1="12" y1="2" x2="12" y2="6"></line>
+                                    <line x1="12" y1="18" x2="12" y2="22"></line>
+                                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                                    <line x1="2" y1="12" x2="6" y2="12"></line>
+                                    <line x1="18" y1="12" x2="22" y2="12"></line>
+                                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                                </svg>
+                            </div>
+                            <button type="button" id="mapSearchClear" class="map-search-clear" title="クリア"
+                                style="display: none;">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- 候補ドロップダウン -->
+                        <div class="map-search-results" id="mapSearchResults"></div>
+                    </div>
+
+                    <!-- 方角＆ズーム表示 -->
+                    <div class="map-overlay-info">
+                        <svg class="compass-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
+                        </svg>
+                        <span>N</span>
+                        <span style="color: var(--text-muted);">|</span>
+                        <span id="mapZoomDisplay">Zoom 16</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 下部ビューポート: 横長タイムラインエディタ -->
+        <div class="workspace-bottom">
+            <!-- タイムラインツールバー -->
+            <div class="timeline-toolbar">
+                <!-- 左側: 選択ツール群 (矢印、前方選択、後方選択、範囲選択) -->
+                <div class="timeline-tools-left">
+                    <div class="tool-btn-group">
+                        <button type="button" class="btn-tool active" id="toolSelect" title="選択ツール (V)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 3l7 18 3-7 7-3L3 3z"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="btn-tool" id="toolSelectMarquee" title="範囲選択ツール (B) - 矩形ドラッグで選択">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="3 3"></rect>
+                            </svg>
+                        </button>
+                        <button type="button" class="btn-tool" id="toolSelectForward" title="前方選択ツール (A) - 選択位置以降を全選択">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="4" width="10" height="16" rx="2" stroke-dasharray="2.5 2.5"></rect>
+                                <line x1="14" y1="12" x2="22" y2="12"></line>
+                                <polyline points="18 8 22 12 18 16"></polyline>
+                            </svg>
+                        </button>
+                        <button type="button" class="btn-tool" id="toolSelectBackward" title="後方選択ツール (Y) - 選択位置以前を全選択">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="12" y="4" width="10" height="16" rx="2" stroke-dasharray="2.5 2.5"></rect>
+                                <line x1="10" y1="12" x2="2" y2="12"></line>
+                                <polyline points="6 8 2 12 6 16"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm btn-delete-kf" id="btnDeleteKeyframe"
+                        title="選択中のキーフレームを削除 (Del)" disabled>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                        </svg>
+                        <span>削除</span>
+                    </button>
+                </div>
+
+                <!-- 右側: 一時停止 / Undo/Redo / ズーム -->
+                <div class="timeline-tools-right">
+                    <!-- 一時停止（信号待ち）モード切替ボタン -->
+                    <button type="button" id="btnTogglePause" class="btn-pause-mode" title="キーフレーム（単一）を選択すると一時停止を開始できます"
+                        disabled>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="10" y1="15" x2="10" y2="9"></line>
+                            <line x1="14" y1="15" x2="14" y2="9"></line>
+                        </svg>
+                        <span id="pauseBtnLabel">一時停止を開始</span>
+                    </button>
+                    <button type="button" id="btnUndo" class="btn btn-secondary btn-sm" title="元に戻す (Ctrl+Z)" disabled>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 7v6h6"></path>
+                            <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+                        </svg>
+                    </button>
+                    <button type="button" id="btnRedo" class="btn btn-secondary btn-sm" title="やり直す (Ctrl+Y)" disabled>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 7v6h-6"></path>
+                            <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path>
+                        </svg>
+                    </button>
+
+                    <div class="timeline-zoom-control">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                        </svg>
+                        <input type="range" id="timelineZoomSlider" class="zoom-slider" min="20" max="250" value="80"
+                            title="タイムライン表示倍率">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <line x1="11" y1="8" x2="11" y2="14"></line>
+                            <line x1="8" y1="11" x2="14" y2="11"></line>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- タイムライン メイン領域 (左側固定ナビ余白 + スクロールビューポート) -->
+            <div class="timeline-main-area">
+                <!-- 固定左ナビサイドバー: 余白 & 前後キーフレーム移動ボタン (↑/↓) -->
+                <div class="timeline-nav-sidebar">
+                    <button type="button" id="btnPrevKeyframe" class="btn-kf-nav" title="前のキーフレームへ移動 (↑)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="18 15 12 9 6 15"></polyline>
+                        </svg>
+                        <span class="kf-nav-sub">前へ</span>
+                    </button>
+                    <button type="button" id="btnNextKeyframe" class="btn-kf-nav" title="次のキーフレームへ移動 (↓)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                        <span class="kf-nav-sub">次へ</span>
+                    </button>
+                </div>
+
+                <!-- タイムライン スクロールビューポート -->
+                <div class="timeline-viewport" id="timelineViewport">
+                    <div class="timeline-content" id="timelineContent">
+                        <!-- 時間ルーラー -->
+                        <div class="timeline-ruler" id="timelineRuler">
+                            <canvas class="ruler-ticks-canvas" id="rulerCanvas"></canvas>
+                        </div>
+
+                        <!-- キーフレームトラック & 一時停止区間帯 -->
+                        <div class="timeline-track-lane" id="timelineTrack">
+                            <canvas class="track-grid-canvas" id="trackGridCanvas"></canvas>
+                            <!-- キーフレーム要素・一時停止帯がJSで動的配置される -->
+                        </div>
+
+                        <!-- 再生ヘッド (Playhead) -->
+                        <div class="playhead-container" id="playheadContainer">
+                            <div class="playhead-head" id="playheadHandle"></div>
+                            <div class="playhead-line"></div>
+                        </div>
+
+                        <!-- 範囲選択マーキーボックス -->
+                        <div class="timeline-marquee-box" id="timelineMarquee"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ============================================================
+         エクスポートモーダル (720x720クロマキー動画 / ZIP出力)
+         ============================================================ -->
+    <div id="exportModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>エクスポート</span>
+                </h3>
+                <button type="button" class="btn-close" id="btnCloseExportModal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- 設定コントロールコンテナ (エクスポート開始時に非表示化) -->
+                <div id="exportSettingsContainer">
+                    <!-- セクション 1: 地図・カメラ設定 -->
+                    <div class="export-section">
+                        <div class="export-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                                <line x1="8" y1="2" x2="8" y2="18"></line>
+                                <line x1="16" y1="6" x2="16" y2="22"></line>
+                            </svg>
+                            <span>地図・縮尺設定</span>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="exportMapScale">文字・地図スケール</label>
+                                <select id="exportMapScale" class="form-control">
+                                    <option value="2" selected>200% (大)</option>
+                                    <option value="1.5">150% (中)</option>
+                                    <option value="1">100% (標準)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="exportZoom">ズームレベル (縮尺固定)</label>
+                                <select id="exportZoom" class="form-control">
+                                    <option value="14">14 (広域・市街地)</option>
+                                    <option value="15">15 (中広域)</option>
+                                    <option value="16" selected>16 (標準・路地)</option>
+                                    <option value="17">17 (詳細・建物)</option>
+                                    <option value="18">18 (極小・番地)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- セクション 2: デザイン・合成設定 -->
+                    <div class="export-section">
+                        <div class="export-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                                <line x1="7" y1="2" x2="7" y2="22"></line>
+                                <line x1="17" y1="2" x2="17" y2="22"></line>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <line x1="2" y1="7" x2="7" y2="7"></line>
+                                <line x1="2" y1="17" x2="7" y2="17"></line>
+                                <line x1="17" y1="17" x2="22" y2="17"></line>
+                                <line x1="17" y1="7" x2="22" y2="7"></line>
+                            </svg>
+                            <span>デザイン・合成設定</span>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="exportWipeShape">ワイプ形状</label>
+                                <select id="exportWipeShape" class="form-control">
+                                    <option value="circle">円形</option>
+                                    <option value="square">正方形</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="exportChromaColor">背景色 (クロマキー)</label>
+                                <select id="exportChromaColor" class="form-control">
+                                    <option value="#00FF00">グリーンバック (#00FF00)</option>
+                                    <option value="#0000FF">ブルーバック (#0000FF)</option>
+                                    <option value="#FF00FF">マゼンタ (#FF00FF)</option>
+                                    <option value="#000000">ブラック (#000000)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label" for="exportMarkerColor">現在地マーカーの色</label>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <select id="exportMarkerColor" class="form-control" style="flex: 1;">
+                                    <option value="#2563eb" selected>ブルー (#2563eb)</option>
+                                    <option value="#ef4444">レッド (#ef4444)</option>
+                                    <option value="#f97316">オレンジ (#f97316)</option>
+                                    <option value="#10b981">エメラルドグリーン (#10b981)</option>
+                                    <option value="#8b5cf6">パープル (#8b5cf6)</option>
+                                    <option value="#1e293b">ダークネイビー (#1e293b)</option>
+                                    <option value="custom">カスタムカラー指定</option>
+                                </select>
+                                <input type="color" id="exportMarkerColorPicker" value="#2563eb"
+                                    style="width: 44px; height: 38px; padding: 2px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; background: var(--bg-card);"
+                                    title="マーカー色の詳細指定">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- セクション 3: 表示要素 -->
+                    <div class="export-section">
+                        <div class="export-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 11 12 14 22 4"></polyline>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                            </svg>
+                            <span>表示要素</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                                <input type="checkbox" id="exportShowPins" checked>
+                                <span>通過地点（キーフレームピン）を描画する</span>
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                                <input type="checkbox" id="exportShowScale" checked>
+                                <span>縮尺スケールバーを表示する (m/km)</span>
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                                <input type="checkbox" id="exportShowRoute" checked>
+                                <span>これまでの移動軌跡を描画する</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- プログレス表示エリア -->
+                <div id="exportProgressContainer" class="progress-container" style="display: none;">
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="exportProgressBar"></div>
+                    </div>
+                    <div class="progress-status"
+                        style="display: flex; justify-content: space-between; align-items: center;">
+                        <span id="exportStatusText">準備中...</span>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span id="exportEtaText" style="color: var(--text-muted); font-size: 13px;"></span>
+                            <span id="exportPercentText" style="font-weight: 600;">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="btnStartExport" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span>エクスポート開始</span>
+                </button>
+                <button type="button" id="btnDownloadVideoOnly" class="btn btn-secondary" style="display: none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                        <line x1="7" y1="2" x2="7" y2="22"></line>
+                        <line x1="17" y1="2" x2="17" y2="22"></line>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <line x1="2" y1="7" x2="7" y2="7"></line>
+                        <line x1="2" y1="17" x2="7" y2="17"></line>
+                        <line x1="17" y1="17" x2="22" y2="17"></line>
+                        <line x1="17" y1="7" x2="22" y2="7"></line>
+                    </svg>
+                    <span>動画のみ保存</span>
+                </button>
+                <button type="button" id="btnDownloadZip" class="btn btn-accent" style="display: none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>ZIPでまとめて保存</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ============================================================
+         プロジェクト設定モーダル
+         ============================================================ -->
+    <div id="settingsModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                    <span>プロジェクト設定</span>
+                </h3>
+                <button type="button" class="btn-close" id="btnCloseSettingsModal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="settingProjectName">プロジェクト名</label>
+                    <input type="text" id="settingProjectName" class="form-control" value="minimap-project">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="settingPreviewQuality">プレビュー画質</label>
+                    <select id="settingPreviewQuality" class="form-control">
+                        <option value="low">軽量 (低解像度)</option>
+                        <option value="high">高画質 (オリジナル画質)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="settingFps">基準フレームレート (FPS)</label>
+                    <select id="settingFps" class="form-control">
+                        <option value="60">60 fps</option>
+                        <option value="30">30 fps</option>
+                        <option value="29.97">29.97 fps</option>
+                        <option value="24">24 fps</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">プロジェクトデータの書き出し / 読み込み</label>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" id="btnExportJson" class="btn btn-secondary btn-sm">JSON保存</button>
+                        <label class="btn btn-secondary btn-sm" style="cursor: pointer; margin: 0;">
+                            <span>JSON読込</span>
+                            <input type="file" id="inputImportJson" accept=".json" style="display: none;">
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnSaveSettings" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         汎用ダイアログモーダル (alert, confirm の代用)
+         ============================================================ -->
+    <div id="dialogModal" class="modal-backdrop">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="dialogTitle">
+                    <svg id="dialogIconInfo" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <svg id="dialogIconWarning" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="var(--warning-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        style="display: none;">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span id="dialogTitleText">お知らせ</span>
+                </h3>
+                <button type="button" class="btn-close" id="btnDialogClose" aria-label="閉じる">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="dialogMessage"
+                    style="white-space: pre-line; line-height: 1.6; margin: 0; font-size: 14px; color: var(--text-main);">
+                </p>
+            </div>
+            <div class="modal-footer" id="dialogFooter">
+                <button type="button" id="btnDialogCancel" class="btn btn-secondary">キャンセル</button>
+                <button type="button" id="btnDialogOk" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 外部スクリプト (Leaflet, JSZip) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- アプリケーションモジュール -->
+    <script type="module" src="js/app.js?v=0.92d"></script>
+    <!-- トースト通知 -->
+    <div id="vrmToast" class="vrm-toast">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="vrmToastText"></span>
+    </div>
+</body>
+
+</html>
