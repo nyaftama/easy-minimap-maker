@@ -7,13 +7,13 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=0.92d';
-import { VideoController } from './video-controller.js?v=0.92d';
-import { MapController } from './map-controller.js?v=0.92d';
-import { TimelineEditor } from './timeline-editor.js?v=0.92d';
-import { RenderEngine } from './render-engine.js?v=0.92d';
-import { VideoExporter } from './video-exporter.js?v=0.92d';
-import { ZipExporter } from './zip-exporter.js?v=0.92d';
+import { state } from './state.js?v=0.92e';
+import { VideoController } from './video-controller.js?v=0.92e';
+import { MapController } from './map-controller.js?v=0.92e';
+import { TimelineEditor } from './timeline-editor.js?v=0.92e';
+import { RenderEngine } from './render-engine.js?v=0.92e';
+import { VideoExporter } from './video-exporter.js?v=0.92e';
+import { ZipExporter } from './zip-exporter.js?v=0.92e';
 
 class App {
     constructor() {
@@ -33,6 +33,9 @@ class App {
 
         // トーストタイマー
         this.toastTimer = null;
+
+        // 動画ファイルおよび位置情報キャッシュ
+        this.currentVideoFile = null;
 
         this.init();
     }
@@ -189,6 +192,8 @@ class App {
     }
 
     loadVideoFile(file) {
+        this.currentVideoFile = file;
+
         this.videoController.loadSource(file);
 
         // プロジェクト名のデフォルト値を動画ファイル名（拡張子なし）に設定

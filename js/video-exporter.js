@@ -4,7 +4,7 @@
  * (非対応環境向け MediaRecorder フォールバック付き)
  */
 
-import { RouteInterpolator } from './interpolator.js?v=0.92d';
+import { RouteInterpolator } from './interpolator.js?v=0.92e';
 
 export class VideoExporter {
     constructor(renderEngine) {

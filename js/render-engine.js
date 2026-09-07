@@ -8,7 +8,7 @@
  * - 縮尺スケールバー & OSM著作権表記
  */
 
-import { RouteInterpolator } from './interpolator.js?v=0.92d';
+import { RouteInterpolator } from './interpolator.js?v=0.92e';
 
 /** HEXカラーを RGBA 文字列に変換 */
 function hexToRgba(hex, alpha = 1) {

@@ -2098,3 +2098,38 @@ button:disabled,
         transform: rotate(360deg);
     }
 }
+
+/* ポップアップ内「この地点でキーフレームを追加」ボタン */
+.btn-add-kf-from-popup {
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    background: var(--primary-color, #3b82f6);
+    color: #ffffff !important;
+    border: none;
+    transition: background 0.15s ease, transform 0.1s ease;
+    box-sizing: border-box;
+}
+
+.btn-add-kf-from-popup:hover {
+    background: var(--primary-hover, #2563eb);
+    transform: translateY(-1px);
+}
+
+.btn-add-kf-from-popup:active {
+    transform: translateY(0);
+}
+
+.btn-add-kf-from-popup svg {
+    flex-shrink: 0;
+}
+
+

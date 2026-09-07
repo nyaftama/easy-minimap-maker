@@ -8,9 +8,9 @@
  * - ピン近傍ポップアップ (削除 / 現在時刻にコピー追加 / 時刻ジャンプ)
  */
 
-import { state } from './state.js?v=0.92d';
-import { RouteInterpolator } from './interpolator.js?v=0.92d';
-import { MapSearch } from './map-search.js?v=0.92d';
+import { state } from './state.js?v=0.92e';
+import { RouteInterpolator } from './interpolator.js?v=0.92e';
+import { MapSearch } from './map-search.js?v=0.92e';
 
 export class MapController {
     constructor(containerId = 'leafletMap') {
@@ -94,39 +94,39 @@ export class MapController {
                 this.map.removeLayer(this.searchMarker);
                 this.searchMarker = null;
             }
-
-            const { lat, lng } = e.latlng;
-            const currentZoom = this.map.getZoom();
-
-            // 一時停止作成中は地図クリックによるキーフレーム追加・変更を無効化
-            if (state.isPausing) {
-                state.notify('toast_warning', { message: '一時停止の作成中です。「一時停止を終了」を押してください' });
-                return;
+            if (this.videoLocationMarker) {
+                this.map.removeLayer(this.videoLocationMarker);
             }
 
-            // 現在時刻付近 (0.1秒以内) に既にキーフレームが存在するかチェック
-            const existingKf = state.findKeyframeNearTime(state.currentTime, 0.1);
-            if (existingKf) {
-                // 既存のキーフレームの地点を変更 (一時停止ペアも同期更新される)
-                state.updateKeyframe(existingKf.id, {
-                    lat,
-                    lng,
-                    zoom: currentZoom
-                });
-                state.selectSingle(existingKf.id);
-            } else {
-                // 新規キーフレームを追加
-                const newKf = state.addKeyframe(state.currentTime, lat, lng, currentZoom);
-                if (newKf) {
-                    state.selectSingle(newKf.id);
-                }
-            }
+            this.addKeyframeAtCoordinate(e.latlng.lat, e.latlng.lng);
         });
     }
 
     initEvents() {
         document.getElementById('btnFitBounds')?.addEventListener('click', () => this.fitBounds());
         document.getElementById('btnCenterCurrent')?.addEventListener('click', () => this.centerCurrent());
+
+        // ポップアップ内「この地点でキーフレームを追加」ボタンのクリック委任
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.btn-add-kf-from-popup');
+            if (btn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const lat = parseFloat(btn.dataset.lat);
+                const lng = parseFloat(btn.dataset.lng);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    this.addKeyframeAtCoordinate(lat, lng);
+                    this.map?.closePopup();
+                    if (this.searchMarker) {
+                        this.map.removeLayer(this.searchMarker);
+                        this.searchMarker = null;
+                    }
+                    if (this.videoLocationMarker) {
+                        this.map.removeLayer(this.videoLocationMarker);
+                    }
+                }
+            }
+        });
 
         state.subscribe((eventType, payload) => {
             if (eventType === 'keyframes_updated' || eventType === 'project_restored' || eventType === 'project_reset') {
@@ -400,6 +400,25 @@ export class MapController {
         }
     }
 
+    /**
+     * 指定した座標のマーカーが画面中央より下（検索バー等の被り防止）に表示されるよう、
+     * 画面中心位置を上方にオフセットして flyTo を実行
+     * @param {[number, number]} latlng - 目的地点の座標 [lat, lng]
+     * @param {number} zoom - ズームレベル
+     * @param {number} offsetY - ピクセル単位のオフセット (デフォルト -60: 中心を60px上に移動＝マーカーは60px下に表示)
+     */
+    flyToWithOffset(latlng, zoom, offsetY = -60) {
+        if (!this.map) return;
+        try {
+            const targetPoint = this.map.project(latlng, zoom);
+            const centerPoint = L.point(targetPoint.x, targetPoint.y + offsetY);
+            const centerLatLng = this.map.unproject(centerPoint, zoom);
+            this.map.flyTo(centerLatLng, zoom, { duration: 1.2 });
+        } catch (e) {
+            this.map.flyTo(latlng, zoom, { duration: 1.2 });
+        }
+    }
+
     initSearch() {
         this.mapSearch = new MapSearch({
             onSelect: (item) => this.handleSearchResult(item)
@@ -409,7 +428,7 @@ export class MapController {
     handleSearchResult(item) {
         if (!this.map) return;
         const targetZoom = Math.max(this.map.getZoom(), 16);
-        this.map.flyTo([item.lat, item.lng], targetZoom, { duration: 1.2 });
+        this.flyToWithOffset([item.lat, item.lng], targetZoom, -60);
 
         if (this.searchMarker) {
             this.map.removeLayer(this.searchMarker);
@@ -436,10 +455,16 @@ export class MapController {
         }).addTo(this.map);
 
         this.searchMarker.bindPopup(`
-            <div style="font-size: 12px; line-height: 1.4; padding: 2px 0;">
+            <div style="font-size: 12px; line-height: 1.4; padding: 2px 0; min-width: 170px;">
                 <strong style="color: #ffffff; font-size: 13px; font-weight: 700; display: block;">${this.escapeHtml(item.name)}</strong>
                 <div style="color: #94a3b8; font-size: 11px; margin-top: 3px;">${this.escapeHtml(item.subtext)}</div>
-                <div style="margin-top: 6px; color: #60a5fa; font-size: 11px; font-weight: 500;">地図をクリックするとこの地点にキーフレームを追加できます</div>
+                <button type="button" class="btn-add-kf-from-popup" data-lat="${item.lat}" data-lng="${item.lng}">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>この地点でキーフレームを追加</span>
+                </button>
             </div>
         `).openPopup();
     }
@@ -452,4 +477,37 @@ export class MapController {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
     }
+
+    /** 指定座標にキーフレームを追加・更新 */
+    addKeyframeAtCoordinate(lat, lng) {
+        if (!this.map) return null;
+        const currentZoom = this.map.getZoom();
+
+        // 一時停止作成中はキーフレーム追加・変更を無効化
+        if (state.isPausing) {
+            state.notify('toast_warning', { message: '一時停止の作成中です。「一時停止を終了」を押してください' });
+            return null;
+        }
+
+        // 現在時刻付近 (0.1秒以内) に既にキーフレームが存在するかチェック
+        const existingKf = state.findKeyframeNearTime(state.currentTime, 0.1);
+        if (existingKf) {
+            state.updateKeyframe(existingKf.id, {
+                lat,
+                lng,
+                zoom: currentZoom
+            });
+            state.selectSingle(existingKf.id);
+            return existingKf;
+        } else {
+            const newKf = state.addKeyframe(state.currentTime, lat, lng, currentZoom);
+            if (newKf) {
+                state.selectSingle(newKf.id);
+            }
+            return newKf;
+        }
+    }
+
+    /** 動画ファイルの位置情報へマップを移動 */
+
 }
