@@ -7,13 +7,14 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=0.92e';
-import { VideoController } from './video-controller.js?v=0.92e';
-import { MapController } from './map-controller.js?v=0.92e';
-import { TimelineEditor } from './timeline-editor.js?v=0.92e';
-import { RenderEngine } from './render-engine.js?v=0.92e';
-import { VideoExporter } from './video-exporter.js?v=0.92e';
-import { ZipExporter } from './zip-exporter.js?v=0.92e';
+import { state } from './state.js?v=1.00';
+import { VideoController } from './video-controller.js?v=1.00';
+import { MapController } from './map-controller.js?v=1.00';
+import { TimelineEditor } from './timeline-editor.js?v=1.00';
+import { RenderEngine } from './render-engine.js?v=1.00';
+import { VideoExporter } from './video-exporter.js?v=1.00';
+import { ZipExporter } from './zip-exporter.js?v=1.00';
+import { CloudStorage } from './cloud-storage.js?v=1.00';
 
 class App {
     constructor() {
@@ -37,6 +38,9 @@ class App {
         // 動画ファイルおよび位置情報キャッシュ
         this.currentVideoFile = null;
 
+        // クラウドストレージ (Supabase)
+        this.cloudStorage = new CloudStorage();
+
         this.init();
     }
 
@@ -44,10 +48,14 @@ class App {
         this.initAppHeight();
         this.initResponsiveLayout();
         this.initStartScreen();
+        this.initOpenProjectModal();
         this.initWorkspacePlaceholder();
         this.initWorkspaceHeader();
+        this.initMobileMenu();
         this.initSettingsModal();
         this.initExportModal();
+        this.initAuth();
+        this.initCloudProjects();
         this.checkSavedDraft();
         this.initAutoSaveFeedback();
         this.initToastListener();
@@ -297,6 +305,133 @@ class App {
                 }, 3000);
             }
         });
+    }
+
+
+    // ============================================================
+    // プロジェクトを開くモーダル管理 (クラウド / JSON)
+    // ============================================================
+
+    initOpenProjectModal() {
+        const btnOpen = document.getElementById('btnStartOpenProjectModal');
+        const modal = document.getElementById('openProjectModal');
+        const btnClose = document.getElementById('btnCloseOpenProjectModal');
+        const btnOpenCloud = document.getElementById('btnStartOpenCloud');
+        const btnImportJson = document.getElementById('btnStartImportJson');
+        const fileInput = document.getElementById('startInputImportJson');
+
+        const openModal = () => modal?.classList.add('open');
+        const closeModal = () => modal?.classList.remove('open');
+
+        btnOpen?.addEventListener('click', openModal);
+        btnClose?.addEventListener('click', closeModal);
+        modal?.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // クラウドから開く
+        btnOpenCloud?.addEventListener('click', () => {
+            closeModal();
+            this.openCloudModal('open');
+        });
+
+        // JSONファイルから開く
+        btnImportJson?.addEventListener('click', () => {
+            fileInput?.click();
+        });
+
+        fileInput?.addEventListener('change', (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const parsed = JSON.parse(ev.target.result);
+                    state.restoreDraft(parsed);
+                    const nameDisplay = document.getElementById('projectNameDisplay');
+                    if (nameDisplay) nameDisplay.textContent = state.projectName;
+                    closeModal();
+                    this.showWorkspaceScreen();
+                } catch (err) {
+                    App.showModalAlert('JSONファイルの読み込みに失敗しました: ' + err.message, 'エラー', 'warning');
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    // ============================================================
+    // スマートフォン用ハンバーガーメニュー ＆ 認証インジケーター
+    // ============================================================
+
+    initMobileMenu() {
+        const toggleBtn = document.getElementById('btnWsMobileMenuToggle');
+        const dropdown = document.getElementById('wsMobileDropdown');
+        const backdrop = document.getElementById('wsMobileDropdownBackdrop');
+        const authStatusBtn = document.getElementById('btnWsMobileAuthStatus');
+
+        const openMenu = () => dropdown?.classList.add('open');
+        const closeMenu = () => dropdown?.classList.remove('open');
+
+        toggleBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (dropdown?.classList.contains('open')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        backdrop?.addEventListener('click', closeMenu);
+
+        // 各メニュー項目の配線
+        document.getElementById('btnMobileExport')?.addEventListener('click', () => {
+            closeMenu();
+            document.getElementById('btnOpenExport')?.click();
+        });
+
+        document.getElementById('btnMobileCloudSave')?.addEventListener('click', () => {
+            closeMenu();
+            this.openCloudModal('save');
+        });
+
+        document.getElementById('btnMobileCloudProjects')?.addEventListener('click', () => {
+            closeMenu();
+            this.openCloudModal('open');
+        });
+
+        document.getElementById('btnMobileSettings')?.addEventListener('click', () => {
+            closeMenu();
+            document.getElementById('btnOpenSettings')?.click();
+        });
+
+        document.getElementById('btnMobileNewProject')?.addEventListener('click', () => {
+            closeMenu();
+            document.getElementById('btnNewProject')?.click();
+        });
+
+        // ログイン / ログアウト操作
+        const handleAuthAction = async () => {
+            closeMenu();
+            if (this.cloudStorage.currentUser) {
+                const confirmed = await App.showModalConfirm(
+                    `「${this.cloudStorage.currentUser.email}」としてログイン中です。\nログアウトしますか？`,
+                    'ログアウト確認',
+                    'ログアウト',
+                    'キャンセル'
+                );
+                if (confirmed) {
+                    await this.cloudStorage.signOut();
+                }
+            } else {
+                const authModal = document.getElementById('authModal');
+                authModal?.classList.add('open');
+            }
+        };
+
+        document.getElementById('btnMobileAuthAction')?.addEventListener('click', handleAuthAction);
+        authStatusBtn?.addEventListener('click', handleAuthAction);
+        document.getElementById('btnWsAuthStatus')?.addEventListener('click', handleAuthAction);
     }
 
     // ============================================================
@@ -737,6 +872,550 @@ class App {
         }, { passive: true });
     }
 
+
+    // ============================================================
+    // Supabase 認証管理 (メール/パスワード + OAuth)
+    // ============================================================
+
+    initAuth() {
+        const modal = document.getElementById('authModal');
+        const btnClose = document.getElementById('btnCloseAuthModal');
+        const btnStartLogin = document.getElementById('btnStartLogin');
+        const btnWsLogin = document.getElementById('btnWsLogin');
+        const btnStartLogout = document.getElementById('btnStartLogout');
+        const btnWsLogout = document.getElementById('btnWsLogout');
+        const tabLogin = document.getElementById('tabAuthLogin');
+        const tabRegister = document.getElementById('tabAuthRegister');
+        const form = document.getElementById('authForm');
+        const emailInput = document.getElementById('authEmail');
+        const passwordInput = document.getElementById('authPassword');
+        const submitBtn = document.getElementById('btnAuthSubmit');
+        const errorMsg = document.getElementById('authErrorMsg');
+        const successMsg = document.getElementById('authSuccessMsg');
+        const btnGoogle = document.getElementById('btnAuthGoogle');
+        // GitHub login removed
+
+        let isLoginMode = true;
+
+        const openAuthModal = (loginMode = true) => {
+            isLoginMode = loginMode;
+            if (tabLogin && tabRegister) {
+                tabLogin.classList.toggle('active', isLoginMode);
+                tabRegister.classList.toggle('active', !isLoginMode);
+            }
+            if (submitBtn) {
+                const label = submitBtn.querySelector('span') || submitBtn;
+                label.textContent = isLoginMode ? 'ログイン' : 'アカウント作成';
+            }
+            if (errorMsg) errorMsg.style.display = 'none';
+            if (successMsg) successMsg.style.display = 'none';
+            if (emailInput) emailInput.value = '';
+            if (passwordInput) passwordInput.value = '';
+            modal?.classList.add('open');
+        };
+
+        const closeAuthModal = () => {
+            modal?.classList.remove('open');
+        };
+
+        btnStartLogin?.addEventListener('click', () => openAuthModal(true));
+        btnWsLogin?.addEventListener('click', () => openAuthModal(true));
+        btnClose?.addEventListener('click', closeAuthModal);
+        modal?.addEventListener('click', (e) => {
+            if (e.target === modal) closeAuthModal();
+        });
+
+        // ログアウト処理
+        const handleLogout = async () => {
+            const confirmed = await App.showModalConfirm(
+                'ログアウトしますか？\n（ローカルの編集データは保持されます）',
+                'ログアウトの確認',
+                'ログアウト',
+                'キャンセル'
+            );
+            if (confirmed) {
+                try {
+                    await this.cloudStorage.signOut();
+                } catch (err) {
+                    App.showModalAlert('ログアウトに失敗しました: ' + err.message, 'エラー', 'warning');
+                }
+            }
+        };
+        btnStartLogout?.addEventListener('click', handleLogout);
+        btnWsLogout?.addEventListener('click', handleLogout);
+
+        // タブ切り替え
+        tabLogin?.addEventListener('click', () => {
+            isLoginMode = true;
+            tabLogin.classList.add('active');
+            tabRegister?.classList.remove('active');
+            if (submitBtn) {
+                const label = submitBtn.querySelector('span') || submitBtn;
+                label.textContent = 'ログイン';
+            }
+            if (errorMsg) errorMsg.style.display = 'none';
+            if (successMsg) successMsg.style.display = 'none';
+        });
+
+        tabRegister?.addEventListener('click', () => {
+            isLoginMode = false;
+            tabRegister.classList.add('active');
+            tabLogin?.classList.remove('active');
+            if (submitBtn) {
+                const label = submitBtn.querySelector('span') || submitBtn;
+                label.textContent = 'アカウント作成';
+            }
+            if (errorMsg) errorMsg.style.display = 'none';
+            if (successMsg) successMsg.style.display = 'none';
+        });
+
+        // フォーム送信
+        form?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = emailInput?.value.trim();
+            const password = passwordInput?.value;
+
+            if (!email || !password) return;
+
+            if (errorMsg) errorMsg.style.display = 'none';
+            if (successMsg) successMsg.style.display = 'none';
+            if (submitBtn) submitBtn.disabled = true;
+
+            try {
+                if (isLoginMode) {
+                    await this.cloudStorage.signInWithPassword(email, password);
+                    closeAuthModal();
+                } else {
+                    const res = await this.cloudStorage.signUpWithPassword(email, password);
+                    if (res?.user && (!res?.session)) {
+                        if (successMsg) {
+                            successMsg.textContent = '登録確認メールを送信しました。メール内のリンクを開いて登録を完了してください。';
+                            successMsg.style.display = 'block';
+                        }
+                    } else {
+                        closeAuthModal();
+                    }
+                }
+            } catch (err) {
+                if (errorMsg) {
+                    let msg = err.message || '認証に失敗しました';
+                    if (msg.includes('Invalid login credentials')) {
+                        msg = 'メールアドレスまたはパスワードが正しくありません。';
+                    } else if (msg.includes('User already registered')) {
+                        msg = 'このメールアドレスは既に登録されています。ログインをお試しください。';
+                    } else if (msg.includes('Password should be at least')) {
+                        msg = 'パスワードは6文字以上で設定してください。';
+                    }
+                    errorMsg.textContent = msg;
+                    errorMsg.style.display = 'block';
+                }
+            } finally {
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        });
+
+        // ソーシャルログイン (Google / GitHub)
+        btnGoogle?.addEventListener('click', async () => {
+            try {
+                if (errorMsg) errorMsg.style.display = 'none';
+                await this.cloudStorage.signInWithOAuth('google');
+            } catch (err) {
+                if (errorMsg) {
+                    errorMsg.textContent = 'Googleログインに失敗しました: ' + (err.message || '');
+                    errorMsg.style.display = 'block';
+                }
+            }
+        });
+
+
+
+        // ユーザー変更リスナー
+        this.cloudStorage.onUserChange((user) => {
+            this.renderAuthUI(user);
+        });
+    }
+
+    renderAuthUI(user) {
+        // スタート画面
+        const startTopAuthBar = document.getElementById('startTopAuthBar');
+        const startAuthUser = document.getElementById('startAuthUser');
+        const startUserEmail = document.getElementById('startUserEmail');
+        const btnStartLogout = document.getElementById('btnStartLogout');
+        const btnStartLogin = document.getElementById('btnStartLogin');
+
+        // デスクトップ認証インジケーター (ユーザーアイコン + 緑チェック / 赤X)
+        const wsAuthCheck = document.getElementById('wsAuthCheck');
+        const wsAuthCross = document.getElementById('wsAuthCross');
+
+        // モバイルインジケーター (ユーザーアイコン + 緑チェック / 赤X)
+        const wsMobileAuthCheck = document.getElementById('wsMobileAuthCheck');
+        const wsMobileAuthCross = document.getElementById('wsMobileAuthCross');
+
+        // モバイルドロップダウンメニュー内
+        const wsMobileUserHeader = document.getElementById('wsMobileUserHeader');
+        const wsMobileUserEmail = document.getElementById('wsMobileUserEmail');
+        const iconMobileAuthLogin = document.getElementById('iconMobileAuthLogin');
+        const iconMobileAuthLogout = document.getElementById('iconMobileAuthLogout');
+        const textMobileAuthAction = document.getElementById('textMobileAuthAction');
+
+        // 最上部アカウントバーは常時中央に表示
+        if (startTopAuthBar) startTopAuthBar.style.display = 'flex';
+
+        if (user) {
+            const email = user.email || 'ユーザー';
+
+            // スタート画面: ユーザー情報とログアウトボタンを表示、ログインボタン非表示
+            if (startAuthUser) startAuthUser.style.display = 'inline-flex';
+            if (startUserEmail) startUserEmail.textContent = email;
+            if (btnStartLogout) btnStartLogout.style.display = 'inline-flex';
+            if (btnStartLogin) btnStartLogin.style.display = 'none';
+
+            // デスクトップヘッダーインジケーター: 緑チェック表示
+            if (wsAuthCheck) wsAuthCheck.style.display = 'flex';
+            if (wsAuthCross) wsAuthCross.style.display = 'none';
+
+            // モバイルヘッダーインジケーター: 緑チェック表示
+            if (wsMobileAuthCheck) wsMobileAuthCheck.style.display = 'flex';
+            if (wsMobileAuthCross) wsMobileAuthCross.style.display = 'none';
+
+            // モバイルメニュー内
+            if (wsMobileUserHeader) wsMobileUserHeader.style.display = 'flex';
+            if (wsMobileUserEmail) wsMobileUserEmail.textContent = email;
+            if (iconMobileAuthLogin) iconMobileAuthLogin.style.display = 'none';
+            if (iconMobileAuthLogout) iconMobileAuthLogout.style.display = 'inline';
+            if (textMobileAuthAction) textMobileAuthAction.textContent = 'ログアウト';
+        } else {
+            // スタート画面: ログインボタンのみ表示
+            if (startAuthUser) startAuthUser.style.display = 'none';
+            if (btnStartLogout) btnStartLogout.style.display = 'none';
+            if (btnStartLogin) btnStartLogin.style.display = 'inline-flex';
+
+            // デスクトップヘッダーインジケーター: 赤X表示
+            if (wsAuthCheck) wsAuthCheck.style.display = 'none';
+            if (wsAuthCross) wsAuthCross.style.display = 'flex';
+
+            // モバイルヘッダーインジケーター: 赤X表示
+            if (wsMobileAuthCheck) wsMobileAuthCheck.style.display = 'none';
+            if (wsMobileAuthCross) wsMobileAuthCross.style.display = 'flex';
+
+            // モバイルメニュー内
+            if (wsMobileUserHeader) wsMobileUserHeader.style.display = 'none';
+            if (iconMobileAuthLogin) iconMobileAuthLogin.style.display = 'inline';
+            if (iconMobileAuthLogout) iconMobileAuthLogout.style.display = 'none';
+            if (textMobileAuthAction) textMobileAuthAction.textContent = 'ログイン';
+        }
+    }
+
+    // ============================================================
+    // クラウドプロジェクト管理 (Supabase JSONB 保存・復元)
+    // ============================================================
+
+    /**
+     * クラウドプロジェクトモーダルを開く
+     * @param {'open' | 'save' | 'manage'} mode 
+     *   - 'open': スタート画面「クラウドから開く」や編集画面「クラウド」時。保存セクションを非表示にして一覧のみ表示
+     *   - 'save': 編集画面「クラウドに保存」(保存)時。保存済み一覧を非表示にして保存セクションのみ表示
+     *   - 'manage': 全表示
+     */
+    async openCloudModal(mode = 'manage') {
+        if (!this.cloudStorage.currentUser) {
+            const wantLogin = await App.showModalConfirm(
+                'クラウド機能を利用するにはログインが必要です。\nログイン画面を開きますか？',
+                'ログインが必要です',
+                'ログイン',
+                'キャンセル'
+            );
+            if (wantLogin) {
+                const authModal = document.getElementById('authModal');
+                authModal?.classList.add('open');
+            }
+            return;
+        }
+
+        const saveNameInput = document.getElementById('cloudProjectSaveName');
+        if (saveNameInput) {
+            saveNameInput.value = state.projectName || 'minimap-project';
+        }
+
+        const cloudSaveSection = document.getElementById('cloudSaveSection');
+        const cloudSaveDivider = document.getElementById('cloudSaveDivider');
+        const cloudListSection = document.getElementById('cloudListSection');
+        const titleText = document.getElementById('cloudModalTitleText');
+
+        if (mode === 'open') {
+            // 開く専用モード: 保存セクションを非表示、一覧を表示
+            if (cloudSaveSection) cloudSaveSection.style.display = 'none';
+            if (cloudSaveDivider) cloudSaveDivider.style.display = 'none';
+            if (cloudListSection) cloudListSection.style.display = 'block';
+            if (titleText) titleText.textContent = 'クラウドから開く';
+            this.loadAndRenderCloudProjects();
+        } else if (mode === 'save') {
+            // 保存専用モード: 一覧を非表示、保存セクションを表示
+            if (cloudSaveSection) cloudSaveSection.style.display = 'block';
+            if (cloudSaveDivider) cloudSaveDivider.style.display = 'none';
+            if (cloudListSection) cloudListSection.style.display = 'none';
+            if (titleText) titleText.textContent = 'クラウドに保存';
+        } else {
+            // 通常管理モード: 全表示
+            if (cloudSaveSection) cloudSaveSection.style.display = 'block';
+            if (cloudSaveDivider) cloudSaveDivider.style.display = 'block';
+            if (cloudListSection) cloudListSection.style.display = 'block';
+            if (titleText) titleText.textContent = 'クラウドプロジェクト管理';
+            this.loadAndRenderCloudProjects();
+        }
+
+        this.updateCloudStatusUI();
+        const modal = document.getElementById('cloudProjectsModal');
+        modal?.classList.add('open');
+    }
+
+    initCloudProjects() {
+        const modal = document.getElementById('cloudProjectsModal');
+        const btnClose = document.getElementById('btnCloseCloudModal');
+        const btnCloseFooter = document.getElementById('btnCloseCloudModalFooter');
+        const btnCloudProjects = document.getElementById('btnCloudProjects');
+        const btnCloudSave = document.getElementById('btnCloudSave');
+        const btnExecuteSave = document.getElementById('btnExecuteCloudSave');
+        const btnExecuteSaveAsNew = document.getElementById('btnExecuteCloudSaveAsNew');
+        const btnRefresh = document.getElementById('btnRefreshCloudList');
+
+        const closeCloudModal = () => {
+            modal?.classList.remove('open');
+        };
+
+        btnCloudProjects?.addEventListener('click', () => this.openCloudModal('open'));
+        btnCloudSave?.addEventListener('click', () => this.openCloudModal('save'));
+        btnClose?.addEventListener('click', closeCloudModal);
+        btnCloseFooter?.addEventListener('click', closeCloudModal);
+        modal?.addEventListener('click', (e) => {
+            if (e.target === modal) closeCloudModal();
+        });
+
+        btnRefresh?.addEventListener('click', () => {
+            this.loadAndRenderCloudProjects();
+        });
+
+        // クラウド保存（既存上書きまたは新規）
+        btnExecuteSave?.addEventListener('click', async () => {
+            await this.handleSaveProject(false);
+        });
+
+        // 別名で保存（新規作成）
+        btnExecuteSaveAsNew?.addEventListener('click', async () => {
+            await this.handleSaveProject(true);
+        });
+    }
+
+    updateCloudStatusUI() {
+        const statusEl = document.getElementById('cloudCurrentStatus');
+        const idText = document.getElementById('cloudCurrentIdText');
+        const btnSaveAsNew = document.getElementById('btnExecuteCloudSaveAsNew');
+
+        if (this.cloudStorage.currentProjectId) {
+            if (statusEl) statusEl.style.display = 'flex';
+            if (idText) idText.textContent = `連携中ID: ${this.cloudStorage.currentProjectId.slice(0, 8)}...`;
+            if (btnSaveAsNew) btnSaveAsNew.style.display = 'inline-flex';
+        } else {
+            if (statusEl) statusEl.style.display = 'none';
+            if (btnSaveAsNew) btnSaveAsNew.style.display = 'none';
+        }
+    }
+
+    async handleSaveProject(forceNew = false) {
+        const saveNameInput = document.getElementById('cloudProjectSaveName');
+        const name = saveNameInput?.value.trim() || state.projectName || 'minimap-project';
+        const btnExecuteSave = document.getElementById('btnExecuteCloudSave');
+
+        if (btnExecuteSave) btnExecuteSave.disabled = true;
+
+        try {
+            const projectData = {
+                projectName: name,
+                fps: state.fps,
+                videoDuration: state.videoDuration,
+                videoFileName: state.videoFileName,
+                keyframes: state.keyframes,
+                exportSettings: state.exportSettings,
+                previewQuality: state.previewQuality
+            };
+
+            await this.cloudStorage.saveProject(name, projectData, null, forceNew);
+            state.projectName = name;
+            const nameDisplay = document.getElementById('projectNameDisplay');
+            if (nameDisplay) nameDisplay.textContent = name;
+
+            this.updateCloudStatusUI();
+            // 保存完了後は保存済み一覧の非表示を解除して表示
+            const cloudListSection = document.getElementById('cloudListSection');
+            const cloudSaveDivider = document.getElementById('cloudSaveDivider');
+            const titleText = document.getElementById('cloudModalTitleText');
+            if (cloudListSection) cloudListSection.style.display = 'block';
+            if (cloudSaveDivider) cloudSaveDivider.style.display = 'block';
+            if (titleText) titleText.textContent = 'クラウドプロジェクト管理';
+            await this.loadAndRenderCloudProjects();
+
+            App.showModalAlert(
+                `プロジェクト「${name}」をクラウドに保存しました。`,
+                '保存完了',
+                'info'
+            );
+        } catch (err) {
+            console.error('[CloudStorage] Save error:', err);
+            let msg = err.message || 'クラウド保存に失敗しました';
+            if (msg.includes('relation "public.projects" does not exist') || msg.includes('does not exist')) {
+                msg = 'Supabase 側に projects テーブルが作成されていません。\nSupabase ダッシュボードの SQL Editor でテーブル定義スクリプトを実行してください。';
+            }
+            App.showModalAlert(msg, '保存エラー', 'warning');
+        } finally {
+            if (btnExecuteSave) btnExecuteSave.disabled = false;
+        }
+    }
+
+    async loadAndRenderCloudProjects() {
+        if (this._isLoadingCloudProjects) return;
+        this._isLoadingCloudProjects = true;
+
+        const spinner = document.getElementById('cloudLoadingSpinner');
+        const emptyEl = document.getElementById('cloudProjectsEmpty');
+        const listEl = document.getElementById('cloudProjectsList');
+
+        if (spinner) spinner.style.display = 'flex';
+        if (emptyEl) emptyEl.style.display = 'none';
+        if (listEl) listEl.innerHTML = '';
+
+        try {
+            const projects = await this.cloudStorage.listProjects();
+            if (spinner) spinner.style.display = 'none';
+
+            // レンダリング直前に再度リストを完全にクリア（重複描画防止）
+            if (listEl) listEl.innerHTML = '';
+
+            if (!projects || projects.length === 0) {
+                if (emptyEl) emptyEl.style.display = 'block';
+                return;
+            }
+
+            projects.forEach((proj) => {
+                const card = document.createElement('div');
+                card.className = 'cloud-project-card';
+                const isCurrent = proj.id === this.cloudStorage.currentProjectId;
+                if (isCurrent) {
+                    card.classList.add('active-project');
+                }
+
+                const kfCount = proj.data?.keyframes?.length || 0;
+                const dateStr = new Date(proj.updated_at || proj.created_at).toLocaleString('ja-JP', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                const videoName = proj.data?.videoFileName ? `動画: ${proj.data.videoFileName}` : '動画なし';
+
+                card.innerHTML = `
+                    <div class="cloud-project-info">
+                        <div class="cloud-project-title-row">
+                            <span class="cloud-project-name">${escapeHtml(proj.name)}</span>
+                            ${isCurrent ? '<span class="cloud-badge-current">編集中</span>' : ''}
+                        </div>
+                        <div class="cloud-project-meta">
+                            <span>更新: ${dateStr}</span>
+                            <span>地点数: ${kfCount}</span>
+                            <span>${escapeHtml(videoName)}</span>
+                        </div>
+                    </div>
+                    <div class="cloud-project-actions">
+                        <button type="button" class="btn btn-primary btn-sm btn-cloud-open" title="このプロジェクトを開く">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12h14"></path>
+                                <path d="m12 5 7 7-7 7"></path>
+                            </svg>
+                            <span>開く</span>
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm btn-cloud-delete" title="プロジェクトを削除">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+
+                // 開くボタン
+                card.querySelector('.btn-cloud-open')?.addEventListener('click', async () => {
+                    await this.loadCloudProject(proj.id);
+                });
+
+                // 削除ボタン
+                card.querySelector('.btn-cloud-delete')?.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const confirmed = await App.showModalConfirm(
+                        `プロジェクト「${proj.name}」を削除しますか？\nこの操作は取り消せません。`,
+                        'プロジェクトの削除',
+                        '削除',
+                        'キャンセル',
+                        true
+                    );
+                    if (confirmed) {
+                        try {
+                            await this.cloudStorage.deleteProject(proj.id);
+                            this.updateCloudStatusUI();
+                            await this.loadAndRenderCloudProjects();
+                        } catch (err) {
+                            App.showModalAlert('削除に失敗しました: ' + err.message, 'エラー', 'warning');
+                        }
+                    }
+                });
+
+                listEl.appendChild(card);
+            });
+        } catch (err) {
+            console.error('[CloudStorage] List error:', err);
+            if (spinner) spinner.style.display = 'none';
+            let msg = err.message || '一覧の取得に失敗しました';
+            if (msg.includes('relation "public.projects" does not exist') || msg.includes('does not exist')) {
+                msg = 'Supabase 側に projects テーブルが作成されていません。\nSupabase ダッシュボードの SQL Editor でテーブル定義スクリプトを実行してください。';
+            }
+            if (emptyEl) {
+                emptyEl.textContent = msg;
+                emptyEl.style.display = 'block';
+            }
+        } finally {
+            this._isLoadingCloudProjects = false;
+        }
+    }
+
+    async loadCloudProject(projectId) {
+        try {
+            const project = await this.cloudStorage.loadProject(projectId);
+            if (!project || !project.data) {
+                throw new Error('プロジェクトデータが存在しません');
+            }
+
+            state.restoreDraft(project.data);
+            const nameDisplay = document.getElementById('projectNameDisplay');
+            if (nameDisplay) nameDisplay.textContent = state.projectName;
+
+            const modal = document.getElementById('cloudProjectsModal');
+            modal?.classList.remove('open');
+
+            this.showWorkspaceScreen();
+
+            // 動画がまだロードされていない場合は案内
+            if (!this.mainVideo.src || this.mainVideo.readyState === 0) {
+                const vName = project.data?.videoFileName ? `（元動画: ${project.data.videoFileName}）` : '';
+                App.showModalAlert(
+                    `クラウドプロジェクト「${project.name}」を読み込みました。\n編集を再開するには動画ファイル${vName}を選択してください。`,
+                    'プロジェクト読み込み完了',
+                    'info'
+                );
+            }
+        } catch (err) {
+            App.showModalAlert('プロジェクトの読み込みに失敗しました: ' + err.message, 'エラー', 'warning');
+        }
+    }
+
     // ============================================================
     // 汎用ダイアログモーダルシステム (alert / confirm の代替)
     // ============================================================
@@ -855,3 +1534,12 @@ document.addEventListener('gestureend', (e) => e.preventDefault());
 window.addEventListener('DOMContentLoaded', () => {
     window.app = new App();
 });
+
+
+function escapeHtml(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}

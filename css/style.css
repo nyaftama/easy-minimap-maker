@@ -288,12 +288,10 @@ textarea {
     background: var(--bg-light);
     border-radius: var(--radius-md);
     border: 1px solid #e8ebee;
-    transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
 .feature-item:hover {
     border-color: #cbd5e1;
-    transform: translateY(-1px);
 }
 
 .feature-icon-box {
@@ -2133,3 +2131,826 @@ button:disabled,
 }
 
 
+
+/* ============================================================
+   認証 & クラウドプロジェクト管理スタイル (Supabase連携)
+   ============================================================ */
+
+/* ヘッダーユーザーアクション */
+.header-user-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.auth-user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(21, 101, 192, 0.08);
+    border: 1px solid var(--primary-border);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--primary-color);
+    box-sizing: border-box;
+    height: 34px;
+}
+
+.auth-user-badge.ws-badge {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-dark);
+    color: var(--text-light);
+    padding: 5px 10px;
+    font-size: 12px;
+    height: 31px;
+}
+
+.user-email-text {
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.ws-auth-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 6px;
+    padding-left: 8px;
+    border-left: 1px solid var(--border-dark);
+}
+
+.btn-outline-subtle {
+    background: transparent;
+    border: 1px solid currentColor;
+    color: inherit;
+    border-radius: var(--radius-sm);
+    padding: 2px 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: var(--transition);
+}
+
+.btn-outline-subtle:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.ws-badge .btn-outline-subtle:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-xs {
+    font-size: 11px;
+    padding: 2px 6px;
+}
+
+/* スタート画面のプロジェクト読み込みボタングループ */
+.start-project-open-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border-color);
+}
+
+/* 認証モーダル */
+.social-login-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.btn-social {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-google {
+    background: #ffffff;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.btn-google:hover {
+    background: #f8f9fa;
+    border-color: #c0c4cc;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.btn-github {
+    background: #24292e;
+    color: #ffffff;
+    border: 1px solid #24292e;
+}
+
+.btn-github:hover {
+    background: #1b1f23;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 18px 0;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.auth-divider span {
+    padding: 0 10px;
+}
+
+.auth-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.auth-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.auth-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.auth-message-box {
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 12px;
+}
+
+.auth-message-box.error {
+    background: var(--danger-light);
+    color: var(--danger-color);
+    border: 1px solid var(--danger-border);
+}
+
+.auth-message-box.success {
+    background: var(--accent-light);
+    color: var(--accent-color);
+    border: 1px solid #a5d6a7;
+}
+
+.auth-note-text {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: 16px;
+    margin-bottom: 0;
+}
+
+/* クラウドプロジェクトモーダル */
+.cloud-save-section {
+    background: var(--bg-light);
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.cloud-save-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.cloud-save-input-row input {
+    flex: 1;
+}
+
+.cloud-current-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.badge-synced {
+    background: var(--accent-light);
+    color: var(--accent-color);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.text-subtle {
+    color: var(--text-muted);
+}
+
+.cloud-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 16px 0;
+}
+
+.cloud-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.cloud-list-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.cloud-loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 30px 0;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.spin-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.cloud-projects-empty {
+    text-align: center;
+    padding: 30px 0;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.cloud-projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.cloud-project-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+}
+
+.cloud-project-card:hover {
+    border-color: var(--primary-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cloud-project-card.active-project {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+}
+
+.cloud-project-info {
+    flex: 1;
+    min-width: 0;
+    padding-right: 12px;
+}
+
+.cloud-project-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cloud-project-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cloud-badge-current {
+    background: var(--primary-color);
+    color: #ffffff;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.cloud-project-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    display: flex;
+    gap: 12px;
+}
+
+.cloud-project-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   ダイアログ最前面化 & レスポンシブ改善 (v1.00)
+   ============================================================ */
+
+/* 汎用ダイアログモーダルを全モーダル・要素の最前面に表示 */
+#dialogModal {
+    z-index: 10050 !important;
+}
+
+/* スタート画面のプロジェクト読み込みボタングループの折り返し制御 */
+.start-project-open-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.start-project-open-actions .btn,
+.start-project-open-actions .auth-user-badge {
+    white-space: nowrap !important;
+    flex-shrink: 0;
+}
+
+/* プロジェクトを開くモーダル（縦並びカードボタングループ） */
+.project-open-vertical-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-open-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-align: left;
+    transition: var(--transition);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-open-option:hover {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(21, 101, 192, 0.08);
+}
+
+.btn-open-option:active {
+    transform: translateY(0);
+}
+
+.open-option-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(21, 101, 192, 0.08);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.open-option-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.open-option-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.open-option-desc {
+    font-size: 12px;
+    color: var(--text-muted-dark);
+    line-height: 1.4;
+}
+
+.open-option-arrow {
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: transform 0.18s ease;
+}
+
+.btn-open-option:hover .open-option-arrow {
+    color: var(--primary-color);
+    transform: translateX(3px);
+}
+
+/* デスクトップ / モバイル ヘッダー切り替え */
+.desktop-only {
+    display: flex;
+}
+
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: flex !important;
+    }
+}
+
+/* モバイル用ヘッダー & 認証インジケーター */
+.workspace-header-mobile {
+    align-items: center;
+    gap: 8px;
+}
+
+.ws-mobile-auth-btn {
+    position: relative;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-dark);
+    color: var(--text-light);
+    border-radius: var(--radius-sm);
+    padding: 6px 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.ws-mobile-auth-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.auth-status-badge {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bg-dark);
+    box-sizing: border-box;
+}
+
+.auth-status-badge.status-logged-in {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.auth-status-badge.status-logged-out {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.btn-hamburger {
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* モバイル用ハンバーガードロップダウンメニュー */
+.ws-mobile-dropdown {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9995;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.ws-mobile-dropdown.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ws-mobile-dropdown-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+}
+
+.ws-mobile-dropdown-content {
+    position: absolute;
+    top: 54px;
+    right: 12px;
+    width: 250px;
+    max-width: calc(100vw - 24px);
+    background: var(--bg-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-dark);
+    overflow: hidden;
+    transform: translateY(-8px);
+    transition: transform 0.2s ease;
+    z-index: 1;
+}
+
+.ws-mobile-dropdown.open .ws-mobile-dropdown-content {
+    transform: translateY(0);
+}
+
+.ws-mobile-user-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid var(--border-dark);
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.user-status-dot.logged-in {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+    flex-shrink: 0;
+}
+
+.ws-mobile-user-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.ws-mobile-menu-items {
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+}
+
+.ws-mobile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-light);
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.ws-mobile-menu-item:hover,
+.ws-mobile-menu-item:active {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.ws-mobile-menu-item.item-accent {
+    color: #34d399;
+    font-weight: 600;
+}
+
+.ws-mobile-menu-item.item-accent:hover {
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.ws-mobile-menu-divider {
+    margin: 4px 6px;
+    border: none;
+    border-top: 1px solid var(--border-dark);
+}
+
+/* クラウドプロジェクト管理モーダルのスマートフォンレスポンシブ改善 */
+@media (max-width: 600px) {
+    .cloud-save-section {
+        padding: 12px;
+    }
+
+    .cloud-save-input-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .cloud-save-input-row input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .cloud-save-input-row .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 9px 12px;
+    }
+
+    .cloud-project-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .cloud-project-info {
+        padding-right: 0;
+    }
+
+    .cloud-project-title-row {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .cloud-project-name {
+        font-size: 14px;
+        max-width: 100%;
+    }
+
+    .cloud-badge-current {
+        white-space: nowrap !important;
+        flex-shrink: 0;
+    }
+
+    .cloud-project-meta {
+        flex-wrap: wrap;
+        gap: 4px 12px;
+        margin-top: 6px;
+        font-size: 11px;
+    }
+
+    .cloud-project-actions {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-top: 8px;
+        border-top: 1px dashed var(--border-color);
+    }
+
+    .cloud-project-actions .btn-cloud-open {
+        flex: 1;
+        justify-content: center;
+        padding: 7px 12px;
+    }
+
+    .cloud-project-actions .btn-cloud-delete {
+        padding: 7px 12px;
+    }
+}
+
+/* スタート画面 最上部アカウントバー (中央寄せ・中身幅の区切り線) */
+.start-top-auth-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 14px;
+    width: 100%;
+}
+
+.start-top-auth-inner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #cbd5e1;
+}
+
+.auth-user-simple {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-muted-dark);
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.auth-user-simple svg {
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.auth-user-simple .user-email-text {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+/* ============================================================
+   タブレット対応 (max-width: 1024px)
+   ============================================================ */
+@media (max-width: 1024px) {
+    /* ワークスペースヘッダーのボタンテキスト非表示 (アイコン優先) */
+    .workspace-header-actions .btn span {
+        display: none !important;
+    }
+
+    .workspace-header-actions .btn {
+        padding: 6px 8px !important;
+        min-width: 34px;
+        justify-content: center;
+    }
+
+    /* タイムラインツールバーの削除ボタンテキスト非表示 */
+    .btn-delete-kf span {
+        display: none !important;
+    }
+
+    /* 動画コントロールバーの内部折り返し */
+    .video-control-bar {
+        height: auto !important;
+        min-height: 44px;
+        padding: 6px 8px !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 6px 10px !important;
+    }
+
+    .timecode-display {
+        font-size: 12px;
+        padding: 4px 6px;
+    }
+
+    .jog-shuttle {
+        height: 30px;
+    }
+
+    .video-step-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}

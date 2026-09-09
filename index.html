@@ -35,8 +35,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
     <!-- Application CSS -->
-    <link rel="stylesheet" href="css/style.css?v=0.92e">
-    <link rel="stylesheet" href="css/timeline.css?v=0.92e">
+    <link rel="stylesheet" href="css/style.css?v=1.00">
+    <link rel="stylesheet" href="css/timeline.css?v=1.00">
 </head>
 
 <body>
@@ -46,10 +46,42 @@
          ============================================================ -->
     <div id="startScreen" class="start-screen-container">
         <div class="container">
+            <!-- スタート画面 最上部アカウントバー (中央寄せ・下部区切り線) -->
+            <div id="startTopAuthBar" class="start-top-auth-bar">
+                <div class="start-top-auth-inner">
+                    <div id="startAuthUser" class="auth-user-simple" style="display: none;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span id="startUserEmail" class="user-email-text"></span>
+                    </div>
+                    <button type="button" id="btnStartLogout" class="btn btn-secondary btn-sm" title="ログアウト" style="display: none;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>ログアウト</span>
+                    </button>
+                    <button type="button" id="btnStartLogin" class="btn btn-secondary btn-sm" title="ログイン">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        <span>ログイン</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- Header Meta -->
             <div class="header-meta">
                 <div class="version-group">
-                    <span class="version-badge">v0.92</span>
+                    <span class="version-badge">v1.00</span>
                     <a href="https://github.com/nyaftama/easy-minimap-maker" target="_blank" rel="noopener noreferrer"
                         class="changelog-link">GitHub</a>
                 </div>
@@ -155,6 +187,20 @@
                         <span>動画ファイルを選択</span>
                     </button>
                 </div>
+
+                <!-- プロジェクト読み込み -->
+                <div class="start-project-open-actions">
+                    <button type="button" id="btnStartOpenProjectModal" class="btn btn-secondary">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        <span>プロジェクトを開く...</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Card 2: ツールの特徴 -->
@@ -255,13 +301,12 @@
                         <div class="feature-icon-box">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
                             </svg>
                         </div>
                         <div class="feature-text">
-                            <strong>ローカル生成</strong>
-                            <p>動画ファイルや位置情報データはすべて端末内のブラウザで高速生成。サーバー等へアップロードされることは一切ありません。</p>
+                            <strong>ルートのクラウド保存</strong>
+                            <p>動画ファイルは外部へ送信せず完全に端末内で処理。作成したルートはクラウド保存でき、別の端末でも作業を再開できます。</p>
                         </div>
                     </div>
                 </div>
@@ -298,7 +343,7 @@
                 </div>
             </div>
 
-            <div class="workspace-header-actions">
+            <div class="workspace-header-actions desktop-only">
                 <button type="button" id="btnNewProject" class="btn btn-secondary btn-sm" title="新規プロジェクト">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -308,6 +353,22 @@
                         <line x1="9" y1="15" x2="15" y2="15"></line>
                     </svg>
                     <span>新規</span>
+                </button>
+                <button type="button" id="btnCloudProjects" class="btn btn-secondary btn-sm" title="クラウドプロジェクト一覧">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                    </svg>
+                    <span>クラウド</span>
+                </button>
+                <button type="button" id="btnCloudSave" class="btn btn-secondary btn-sm" title="クラウドに保存">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+                        <path d="M12 12v9"></path>
+                        <path d="m16 16-4-4-4 4"></path>
+                    </svg>
+                    <span>保存</span>
                 </button>
                 <button type="button" id="btnOpenSettings" class="btn btn-secondary btn-sm" title="設定">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -328,8 +389,141 @@
                     </svg>
                     <span>エクスポート</span>
                 </button>
+                <button type="button" id="btnWsAuthStatus" class="ws-mobile-auth-btn" title="アカウント認証状態">
+                    <svg class="auth-icon-user" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <!-- ログイン中: 緑のチェックマーク -->
+                    <span id="wsAuthCheck" class="auth-status-badge status-logged-in" style="display: none;">
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                    <!-- 未ログイン: 赤のXマーク -->
+                    <span id="wsAuthCross" class="auth-status-badge status-logged-out">
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </span>
+                </button>
+            </div>
+
+            <!-- モバイル用：認証インジケーター ＆ ハンバーガーボタン -->
+            <div class="workspace-header-mobile mobile-only">
+                <button type="button" id="btnWsMobileAuthStatus" class="ws-mobile-auth-btn" title="アカウント認証状態">
+                    <svg class="auth-icon-user" width="17" height="17" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <!-- ログイン中: 緑のチェックマーク -->
+                    <span id="wsMobileAuthCheck" class="auth-status-badge status-logged-in" style="display: none;">
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                    <!-- 未ログイン: 赤のXマーク -->
+                    <span id="wsMobileAuthCross" class="auth-status-badge status-logged-out">
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </span>
+                </button>
+
+                <button type="button" id="btnWsMobileMenuToggle" class="btn btn-secondary btn-sm btn-hamburger"
+                    title="メニュー">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
             </div>
         </header>
+
+        <!-- モバイル用ハンバーガードロップダウンメニュー -->
+        <div id="wsMobileDropdown" class="ws-mobile-dropdown">
+            <div class="ws-mobile-dropdown-backdrop" id="wsMobileDropdownBackdrop"></div>
+            <div class="ws-mobile-dropdown-content">
+                <div id="wsMobileUserHeader" class="ws-mobile-user-header" style="display: none;">
+                    <span class="user-status-dot logged-in"></span>
+                    <span id="wsMobileUserEmail" class="ws-mobile-user-email"></span>
+                </div>
+                <div class="ws-mobile-menu-items">
+                    <button type="button" id="btnMobileExport" class="ws-mobile-menu-item item-accent">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>エクスポート</span>
+                    </button>
+                    <button type="button" id="btnMobileCloudSave" class="ws-mobile-menu-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+                            <path d="M12 12v9"></path>
+                            <path d="m16 16-4-4-4 4"></path>
+                        </svg>
+                        <span>クラウドに保存</span>
+                    </button>
+                    <button type="button" id="btnMobileCloudProjects" class="ws-mobile-menu-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                        </svg>
+                        <span>クラウドプロジェクト一覧</span>
+                    </button>
+                    <button type="button" id="btnMobileSettings" class="ws-mobile-menu-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                            </path>
+                        </svg>
+                        <span>設定</span>
+                    </button>
+                    <button type="button" id="btnMobileNewProject" class="ws-mobile-menu-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        <span>新規プロジェクト</span>
+                    </button>
+                    <hr class="ws-mobile-menu-divider">
+                    <button type="button" id="btnMobileAuthAction" class="ws-mobile-menu-item">
+                        <svg id="iconMobileAuthLogin" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
+                        <svg id="iconMobileAuthLogout" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="display: none;">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span id="textMobileAuthAction">ログイン</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <!-- 上部ビューポート (左: 元動画プレビュー, 右: 地図プレビュー) -->
         <div class="workspace-top">
@@ -947,12 +1141,252 @@
         </div>
     </div>
 
-    <!-- 外部スクリプト (Leaflet, JSZip) -->
+    <!-- プロジェクトを開くモーダル -->
+    <div id="openProjectModal" class="modal-backdrop">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                    <span>プロジェクトを開く</span>
+                </h3>
+                <button type="button" class="btn-close" id="btnCloseOpenProjectModal" aria-label="閉じる">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p
+                    style="margin-top: 0; margin-bottom: 16px; font-size: 13px; color: var(--text-muted-dark); line-height: 1.5;">
+                    保存済みのプロジェクトデータ（キーフレーム・ルート設定等）を読み込みます。
+                </p>
+                <div class="project-open-vertical-group">
+                    <button type="button" id="btnStartOpenCloud" class="btn-open-option">
+                        <div class="open-option-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                            </svg>
+                        </div>
+                        <div class="open-option-text">
+                            <span class="open-option-title">クラウドから開く</span>
+                            <span class="open-option-desc">クラウドに保存したプロジェクト一覧から選択</span>
+                        </div>
+                        <svg class="open-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+
+                    <button type="button" id="btnStartImportJson" class="btn-open-option">
+                        <div class="open-option-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="12" x2="12" y2="18"></line>
+                                <polyline points="9 15 12 18 15 15"></polyline>
+                            </svg>
+                        </div>
+                        <div class="open-option-text">
+                            <span class="open-option-title">JSONファイルから開く</span>
+                            <span class="open-option-desc">端末に保存した .json ファイルを選択して読み込み</span>
+                        </div>
+                        <svg class="open-option-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                    <input type="file" id="startInputImportJson" accept=".json" style="display: none;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 認証モーダル (Supabase Auth: メール/パスワード + OAuth) -->
+    <div id="authModal" class="modal-backdrop">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span>アカウント認証</span>
+                </h3>
+                <button type="button" class="btn-close" id="btnCloseAuthModal" aria-label="閉じる">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- ソーシャルログイン -->
+                <div class="social-login-group">
+                    <button type="button" id="btnAuthGoogle" class="btn btn-social btn-google">
+                        <svg width="18" height="18" viewBox="0 0 24 24">
+                            <path fill="#EA4335"
+                                d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z" />
+                            <path fill="#4285F4"
+                                d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5.1 3.7-8.9z" />
+                            <path fill="#FBBC05"
+                                d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3 0-.8.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 12s.7 2.3 1.9 4.7l3.7-2.9z" />
+                            <path fill="#34A853"
+                                d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16c1.8 3.7 5.6 7 10.1 7z" />
+                        </svg>
+                        <span>Google でログイン</span>
+                    </button>
+
+                </div>
+
+                <div class="auth-divider">
+                    <span>またはメールアドレス</span>
+                </div>
+
+                <!-- タブ切り替え（ログイン / 新規登録） -->
+                <div class="auth-tabs">
+                    <button type="button" class="auth-tab active" id="tabAuthLogin">ログイン</button>
+                    <button type="button" class="auth-tab" id="tabAuthRegister">新規登録</button>
+                </div>
+
+                <form id="authForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label class="form-label" for="authEmail">メールアドレス</label>
+                        <input type="email" id="authEmail" class="form-control" placeholder="name@example.com" required
+                            autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="authPassword">パスワード</label>
+                        <input type="password" id="authPassword" class="form-control" placeholder="6文字以上" required
+                            autocomplete="current-password">
+                    </div>
+                    <div id="authErrorMsg" class="auth-message-box error" style="display: none;"></div>
+                    <div id="authSuccessMsg" class="auth-message-box success" style="display: none;"></div>
+                    <button type="submit" id="btnAuthSubmit" class="btn btn-primary btn-block"
+                        style="margin-top: 12px;">
+                        <span>ログイン</span>
+                    </button>
+                </form>
+
+                <p class="auth-note-text">
+                    プロジェクトデータ（JSON形式のキーフレーム情報等）のみがクラウド保存されます。動画ファイル本体はアップロードされません。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- クラウドプロジェクト管理モーダル -->
+    <div id="cloudProjectsModal" class="modal-backdrop">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                    </svg>
+                    <span id="cloudModalTitleText">クラウドプロジェクト管理</span>
+                </h3>
+                <button type="button" class="btn-close" id="btnCloseCloudModal" aria-label="閉じる">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- 現在のプロジェクトを保存するセクション -->
+                <div id="cloudSaveSection" class="cloud-save-section">
+                    <div class="form-group" style="margin-bottom: 8px;">
+                        <label class="form-label" for="cloudProjectSaveName">プロジェクト名</label>
+                        <div class="cloud-save-input-row">
+                            <input type="text" id="cloudProjectSaveName" class="form-control" placeholder="プロジェクト名を入力">
+                            <button type="button" id="btnExecuteCloudSave" class="btn btn-primary">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                </svg>
+                                <span>クラウド保存</span>
+                            </button>
+                            <button type="button" id="btnExecuteCloudSaveAsNew" class="btn btn-secondary"
+                                style="display: none;">
+                                <span>別名で保存</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="cloudCurrentStatus" class="cloud-current-info" style="display: none;">
+                        <span class="badge-synced">クラウド連携中</span>
+                        <span id="cloudCurrentIdText" class="text-subtle">ID: -</span>
+                    </div>
+                </div>
+
+                <div id="cloudSaveDivider" class="cloud-divider"></div>
+
+                <!-- 保存済みプロジェクト一覧セクション -->
+                <div id="cloudListSection" class="cloud-list-section">
+                    <div class="cloud-list-header">
+                        <h4 class="cloud-list-title">保存済みプロジェクト一覧</h4>
+                        <button type="button" id="btnRefreshCloudList" class="btn btn-secondary btn-xs" title="一覧を再読み込み">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <polyline points="1 20 1 14 7 14"></polyline>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                            <span>更新</span>
+                        </button>
+                    </div>
+
+                    <div id="cloudLoadingSpinner" class="cloud-loading-spinner" style="display: none;">
+                        <svg class="spin-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="2" x2="12" y2="6"></line>
+                            <line x1="12" y1="18" x2="12" y2="22"></line>
+                            <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                            <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                            <line x1="2" y1="12" x2="6" y2="12"></line>
+                            <line x1="18" y1="12" x2="22" y2="12"></line>
+                            <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                            <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                        </svg>
+                        <span>読み込み中...</span>
+                    </div>
+
+                    <div id="cloudProjectsEmpty" class="cloud-projects-empty" style="display: none;">
+                        <p>保存されているプロジェクトはありません</p>
+                    </div>
+
+                    <div id="cloudProjectsList" class="cloud-projects-list">
+                        <!-- JavaScriptで動的生成 -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnCloseCloudModalFooter" class="btn btn-secondary">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 外部スクリプト (Leaflet, JSZip, Supabase) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- アプリケーションモジュール -->
-    <script type="module" src="js/app.js?v=0.92e"></script>
+    <script type="module" src="js/app.js?v=1.00"></script>
     <!-- トースト通知 -->
     <div id="vrmToast" class="vrm-toast">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
