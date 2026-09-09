@@ -3,7 +3,7 @@
  * 動画再生制御・フレーム移動・ジョグスクラバー・軽量プレビューレンダリング
  */
 
-import { state } from './state.js?v=1.01c';
+import { state } from './state.js?v=1.01e';
 
 export class VideoController {
     constructor(videoEl, options = {}) {
@@ -138,7 +138,7 @@ export class VideoController {
 
         // プロジェクト状態の復元・変更を購読して表示を自動同期
         state.subscribe((eventType) => {
-            if (eventType === 'project_restored' || eventType === 'project_reset' || eventType === 'keyframes_updated') {
+            if (eventType === 'project_restored' || eventType === 'project_reset') {
                 this.updateTimeDisplay();
                 this.updatePlayBtn();
             }

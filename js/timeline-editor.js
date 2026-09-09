@@ -8,7 +8,7 @@
  * - 最大10世代の Undo / Redo
  */
 
-import { state } from './state.js?v=1.01c';
+import { state } from './state.js?v=1.01e';
 
 export class TimelineEditor {
     constructor(videoController) {
@@ -79,19 +79,7 @@ export class TimelineEditor {
             this.drawRuler();
         });
 
-        // ビューポートの可視化や寸法変化を即座に検知して再計算
-        if (typeof ResizeObserver !== 'undefined' && this.viewport) {
-            this.resizeObserver = new ResizeObserver((entries) => {
-                for (const entry of entries) {
-                    if (entry.contentRect.width > 0) {
-                        this.updateDimensions();
-                        this.drawRuler();
-                        this.updatePlayheadPosition();
-                    }
-                }
-            });
-            this.resizeObserver.observe(this.viewport);
-        }
+
     }
 
     bindState() {
@@ -195,7 +183,9 @@ export class TimelineEditor {
         const x = state.currentTime * this.pxPerSec;
         this.playheadContainer.style.transform = `translateX(${x}px)`;
 
-        if (this.videoController.isPlaying && !this.isDraggingPlayhead) {
+        if (this.isDraggingPlayhead || this.isDraggingKeyframes) return;
+
+        if (this.videoController.isPlaying) {
             const scrollLeft = this.viewport.scrollLeft;
             const clientWidth = this.viewport.clientWidth;
             const margin = 16; // ページ送り後の左端視認マージン
@@ -207,6 +197,35 @@ export class TimelineEditor {
             } else if (x < scrollLeft) {
                 // シークやループ再生等で現在の表示範囲より前に戻った場合
                 this.viewport.scrollLeft = Math.max(0, x - margin);
+            }
+        } else {
+            // 動画停止中のステップ操作やジャンプ移動時に、再生ヘッドが画面内に収まるよう自動スクロール
+            this.ensurePlayheadVisible();
+        }
+    }
+
+    /**
+     * 再生ヘッドが表示領域内に収まるようスクロールを調整
+     * @param {boolean} forceCenter trueの場合は表示範囲内であっても中央にスクロール
+     */
+    ensurePlayheadVisible(forceCenter = false) {
+        if (!this.viewport || this.isDraggingPlayhead || this.isDraggingKeyframes) return;
+        const clientWidth = this.viewport.clientWidth;
+        if (clientWidth <= 0) return;
+
+        const x = state.currentTime * this.pxPerSec;
+        const scrollLeft = this.viewport.scrollLeft;
+        // 画面端からの視認マージン (画面幅の10%、最小32px、最大80px)
+        const margin = Math.min(80, Math.max(32, clientWidth * 0.1));
+
+        const isVisible = (x >= scrollLeft + margin && x <= scrollLeft + clientWidth - margin);
+
+        if (forceCenter || !isVisible) {
+            const maxScroll = Math.max(0, this.viewport.scrollWidth - clientWidth);
+            const targetScrollLeft = Math.max(0, Math.min(maxScroll, Math.round(x - clientWidth / 2)));
+            if (Math.abs(this.viewport.scrollLeft - targetScrollLeft) > 1) {
+                this.viewport.scrollLeft = targetScrollLeft;
+                this.drawRuler();
             }
         }
     }
@@ -462,6 +481,7 @@ export class TimelineEditor {
             this.isDraggingKeyframes = false;
             window.removeEventListener('pointermove', onMove);
             window.removeEventListener('pointerup', onUp);
+            window.removeEventListener('pointercancel', onUp);
 
             // ドラッグせずにクリックされた場合のみ、そのキーフレーム時刻へヘッドをシーク
             if (!hasMoved && targetKf) {
@@ -471,6 +491,7 @@ export class TimelineEditor {
 
         window.addEventListener('pointermove', onMove);
         window.addEventListener('pointerup', onUp);
+        window.addEventListener('pointercancel', onUp);
     }
 
     initTrackInteraction() {
@@ -529,6 +550,7 @@ export class TimelineEditor {
 
         window.addEventListener('pointermove', onMove);
         window.addEventListener('pointerup', onUp);
+        window.addEventListener('pointercancel', onUp);
     }
 
     updateSelectionVisuals() {

@@ -317,6 +317,7 @@
     transform: rotate(45deg);
     cursor: pointer;
     z-index: 20;
+    touch-action: none; /* スマホでのタッチスクロール競合を防止 */
     transition: transform 0.1s ease, background 0.1s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
