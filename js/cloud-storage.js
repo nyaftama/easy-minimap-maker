@@ -1,7 +1,7 @@
 // cloud-storage.js
 // Supabase 認証およびプロジェクトデータのクラウド保存管理モジュール
 
-import { getSupabaseClient } from './supabase-config.js?v=1.00';
+import { getSupabaseClient } from './supabase-config.js?v=1.00a';
 
 export class CloudStorage {
     constructor() {

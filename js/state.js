@@ -13,7 +13,7 @@ const STORAGE_KEY = 'vrm_draft_project_v1';
 class ProjectState {
     constructor() {
         this.projectName = 'minimap-project';
-        this.fps = 30;
+        this.fps = 15;
         this.videoDuration = 0;
         this.videoFileName = '';
         this.currentTime = 0;
@@ -521,7 +521,7 @@ class ProjectState {
     restoreDraft(draft) {
         if (!draft) return;
         this.projectName = draft.projectName || 'minimap-project';
-        this.fps = draft.fps || 30;
+        this.fps = draft.fps || 15;
         this.videoFileName = draft.videoFileName || '';
         this.videoDuration = draft.videoDuration || 0;
         this.keyframes = draft.keyframes || [];

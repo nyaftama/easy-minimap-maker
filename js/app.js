@@ -7,14 +7,14 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=1.00';
-import { VideoController } from './video-controller.js?v=1.00';
-import { MapController } from './map-controller.js?v=1.00';
-import { TimelineEditor } from './timeline-editor.js?v=1.00';
-import { RenderEngine } from './render-engine.js?v=1.00';
-import { VideoExporter } from './video-exporter.js?v=1.00';
-import { ZipExporter } from './zip-exporter.js?v=1.00';
-import { CloudStorage } from './cloud-storage.js?v=1.00';
+import { state } from './state.js?v=1.00a';
+import { VideoController } from './video-controller.js?v=1.00a';
+import { MapController } from './map-controller.js?v=1.00a';
+import { TimelineEditor } from './timeline-editor.js?v=1.00a';
+import { RenderEngine } from './render-engine.js?v=1.00a';
+import { VideoExporter } from './video-exporter.js?v=1.00a';
+import { ZipExporter } from './zip-exporter.js?v=1.00a';
+import { CloudStorage } from './cloud-storage.js?v=1.00a';
 
 class App {
     constructor() {
@@ -474,7 +474,12 @@ class App {
 
         btnOpen?.addEventListener('click', () => {
             if (nameInput) nameInput.value = state.projectName;
-            if (fpsSelect) fpsSelect.value = String(state.fps);
+            if (fpsSelect) {
+                if (!['15', '10'].includes(String(state.fps))) {
+                    state.fps = 15;
+                }
+                fpsSelect.value = String(state.fps);
+            }
             if (qualitySelect) qualitySelect.value = state.previewQuality || 'low';
             modal?.classList.add('open');
         });
@@ -660,7 +665,7 @@ class App {
 
         btnStart?.addEventListener('click', async () => {
             const duration = state.videoDuration || (state.keyframes[state.keyframes.length - 1]?.time || 60);
-            const fps = state.fps || 30;
+            const fps = state.fps || 15;
             let currentMarkerColor = '#2563eb';
             if (markerColorSelect && markerColorSelect.value !== 'custom') {
                 currentMarkerColor = markerColorSelect.value;

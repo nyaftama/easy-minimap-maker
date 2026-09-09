@@ -3,7 +3,7 @@
  * 動画再生制御・フレーム移動・ジョグスクラバー・軽量プレビューレンダリング
  */
 
-import { state } from './state.js?v=1.00';
+import { state } from './state.js?v=1.00a';
 
 export class VideoController {
     constructor(videoEl, options = {}) {
@@ -234,7 +234,7 @@ export class VideoController {
 
     stepFrames(deltaFrames) {
         this.video.pause();
-        const frameTime = 1 / (state.fps || 30);
+        const frameTime = 1 / (state.fps || 15);
         this.seekTo(this.video.currentTime + deltaFrames * frameTime);
     }
 
@@ -299,7 +299,7 @@ export class VideoController {
     /** タイムコードフォーマット: HH:MM:SS.ff (フレーム番号) */
     formatTimecode(seconds) {
         if (isNaN(seconds) || seconds < 0) seconds = 0;
-        const fps = state.fps || 30;
+        const fps = state.fps || 15;
         const totalFrames = Math.floor(seconds * fps);
         const f = totalFrames % Math.round(fps);
         const s = Math.floor(seconds) % 60;
@@ -335,7 +335,7 @@ export class VideoController {
             if (!isDragging) return;
             const currentX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
             const deltaX = currentX - startX;
-            const frameTime = 1 / (state.fps || 30);
+            const frameTime = 1 / (state.fps || 15);
             const framesDelta = deltaX / 10;
             this.seekTo(lastTime + framesDelta * frameTime);
         };

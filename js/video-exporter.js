@@ -4,7 +4,7 @@
  * (非対応環境向け MediaRecorder フォールバック付き)
  */
 
-import { RouteInterpolator } from './interpolator.js?v=1.00';
+import { RouteInterpolator } from './interpolator.js?v=1.00a';
 
 export class VideoExporter {
     constructor(renderEngine) {
@@ -98,13 +98,24 @@ export class VideoExporter {
             error: (e) => console.error('VideoEncoder error:', e)
         });
 
-        encoder.configure({
+        const encoderConfig = {
             codec: 'avc1.42001f', // H.264 Baseline / Main Profile
             width: 720,
             height: 720,
-            bitrate: 4_000_000,   // 4 Mbps (720pに十分な高画質)
-            framerate: fps
-        });
+            bitrate: 3_500_000,   // 3.5 Mbps (720p 10-15fpsに十分すぎる高画質)
+            framerate: fps,
+            hardwareAcceleration: 'prefer-hardware', // GPUハードウェアエンコーダを優先
+            latencyMode: 'quality'
+        };
+
+        try {
+            encoder.configure(encoderConfig);
+        } catch (err) {
+            console.warn('[VideoExporter] Hardware acceleration configuration failed, fallback to software:', err);
+            delete encoderConfig.hardwareAcceleration;
+            delete encoderConfig.latencyMode;
+            encoder.configure(encoderConfig);
+        }
 
         const totalFrames = Math.ceil(duration * fps);
 
@@ -120,13 +131,33 @@ export class VideoExporter {
             encoder.encode(videoFrame, { keyFrame: isKeyframe });
             videoFrame.close();
 
-            // 定期的にエンコーダのバッファをフラッシュ
-            if (encoder.encodeQueueSize > 5) {
-                await new Promise(r => setTimeout(r, 5));
+            // キューが溜まった場合は dequeue イベントまたは短縮タイマーで効率的に待機
+            if (encoder.encodeQueueSize > 8) {
+                await new Promise(resolve => {
+                    let done = false;
+                    const timer = setTimeout(() => {
+                        if (!done) {
+                            done = true;
+                            encoder.ondequeue = null;
+                            resolve();
+                        }
+                    }, 20);
+                    encoder.ondequeue = () => {
+                        if (!done) {
+                            done = true;
+                            clearTimeout(timer);
+                            encoder.ondequeue = null;
+                            resolve();
+                        }
+                    };
+                });
+            } else if (i % 6 === 0) {
+                // UI描画（進捗バー）更新とイベントループの解放
+                await new Promise(r => setTimeout(r, 0));
             }
 
-            if (onProgress && i % 5 === 0) {
-                const percent = 20 + Math.round((i / totalFrames) * 75);
+            if (onProgress && (i % 3 === 0 || i === totalFrames - 1)) {
+                const percent = 20 + Math.round(((i + 1) / totalFrames) * 75);
                 onProgress(percent, `動画エンコード中... (${i + 1}/${totalFrames} フレーム)`);
             }
         }
