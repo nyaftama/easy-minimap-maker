@@ -13,7 +13,7 @@ const STORAGE_KEY = 'vrm_draft_project_v1';
 class ProjectState {
     constructor() {
         this.projectName = 'minimap-project';
-        this.fps = 15;
+        this.fps = 30; // タイムラインFPSは30固定
         this.videoDuration = 0;
         this.videoFileName = '';
         this.currentTime = 0;
@@ -34,6 +34,7 @@ class ProjectState {
         this.exportSettings = {
             width: 720,
             height: 720,
+            fps: 2,                 // 出力動画フレームレート (1-15、デフォルト: 2)
             shape: 'circle',        // "circle" | "square"
             chromaColor: '#00FF00', // クロマキー背景色
             showScale: true,        // 縮尺スケールバー表示
@@ -521,7 +522,7 @@ class ProjectState {
     restoreDraft(draft) {
         if (!draft) return;
         this.projectName = draft.projectName || 'minimap-project';
-        this.fps = draft.fps || 15;
+        this.fps = 30; // タイムラインFPSは30固定
         this.videoFileName = draft.videoFileName || '';
         this.videoDuration = draft.videoDuration || 0;
         this.keyframes = draft.keyframes || [];
@@ -530,6 +531,9 @@ class ProjectState {
             ...(draft.exportSettings || {})
         };
         // 未設定時のフォールバック
+        if (this.exportSettings.fps === undefined || this.exportSettings.fps === null) {
+            this.exportSettings.fps = 2;
+        }
         if (!this.exportSettings.markerColor) this.exportSettings.markerColor = '#2563eb';
         if (this.exportSettings.showPins === undefined) this.exportSettings.showPins = true;
         this.previewQuality = draft.previewQuality || 'low';

@@ -35,8 +35,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
     <!-- Application CSS -->
-    <link rel="stylesheet" href="css/style.css?v=1.00d">
-    <link rel="stylesheet" href="css/timeline.css?v=1.00d">
+    <link rel="stylesheet" href="css/style.css?v=1.00g">
+    <link rel="stylesheet" href="css/timeline.css?v=1.00g">
 </head>
 
 <body>
@@ -100,9 +100,9 @@
 
             <!-- Tool Links -->
             <div class="tool-links">
-                <a href="https://nyaftama.github.io/ar-banner-flag/" target="_blank" rel="noopener noreferrer"
+                <a href="https://nyaftama.github.io/uma-new-era-title/" target="_blank" rel="noopener noreferrer"
                     class="tool-link">
-                    <span>ARのぼり旗カメラ</span>
+                    <span>劇場版レース名メーカー</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -227,8 +227,8 @@
                             </svg>
                         </div>
                         <div class="feature-text">
-                            <strong>GPSログ不要</strong>
-                            <p>GPSロガーや位置情報データがなくても、動画を見ながら交差点や曲がり角で地図をタップするだけでルートを作成。区間は自動で滑らかに補間されます。</p>
+                            <strong>GPSログ不要・直感的なルート作成</strong>
+                            <p>GPSトラッカーや位置情報データがなくても、動画を見ながら交差点や曲がり角で地図をタップするだけでルート構築。区間は自動で補間されます。</p>
                         </div>
                     </div>
 
@@ -243,7 +243,35 @@
                         </div>
                         <div class="feature-text">
                             <strong>信号待ち・立ち止まりに対応</strong>
-                            <p>「一時停止を開始／終了」の2タップで、動画が流れていても現在地がその場に留まる信号待ちや立ち寄り区間を自然に定義できます。</p>
+                            <p>「一時停止を開始／終了」の2タップで、動画が流れていても現在地がその場に留まる信号待ちや寄り道スポットを正確に表現できます。</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                <path d="M7 15h0M2 9.5h20M2 14.5h20M7 4v5.5M17 4v5.5M7 14.5v5.5M17 14.5v5.5"></path>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>本格的なタイムライン編集</strong>
+                            <p>編集ソフト風のレイアウトで、タイムラインを精密に操作。4種の選択ツール、時間の一括シフト、取り消し/やり直しに対応しています。</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>地名・住所・座標の高速検索</strong>
+                            <p>国土地理院ジオコーダーとOSM Photonのハイブリッド検索により、国内から海外まで駅名・施設名・交差点やGoogleマップURLから目的地へ即座に移動できます。</p>
                         </div>
                     </div>
 
@@ -262,8 +290,9 @@
                             </svg>
                         </div>
                         <div class="feature-text">
-                            <strong>クロマキー動画を一括出力</strong>
-                            <p>Adobe Premiere等のUltraキーで使える720x720のクロマキー動画を出力。縮尺スケールバーも自動描画されます。</p>
+                            <strong>クロマキー動画・高速出力</strong>
+                            <p>Adobe PremiereのUltraキー等で即座に合成できる720×720の動画を出力。1〜15 fps対応とWebCodecsにより劇的な高速書き出しが可能です。
+                            </p>
                         </div>
                     </div>
 
@@ -279,8 +308,21 @@
                             </svg>
                         </div>
                         <div class="feature-text">
-                            <strong>GPX/GeoJSONの出力可能</strong>
-                            <p>作成したルートはクロマキー動画だけでなく、GPXやGeoJSONなどの標準位置情報フォーマットとしても一括保存できます。</p>
+                            <strong>GPX / GeoJSON / JSON出力</strong>
+                            <p>作成したルートは動画だけでなく、地図アプリやナビサービスで使える標準GPX/GeoJSONや、再編集用プロジェクトJSONファイルをまとめてZIP保存できます。</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                        </div>
+                        <div class="feature-text">
+                            <strong>動画の外部送信なし</strong>
+                            <p>動画ファイル本体はサーバーへ一切アップロードされず、端末内（ブラウザ）でのみ処理。通信量を消費せず、未公開映像も安心して読み込めます。</p>
                         </div>
                     </div>
 
@@ -293,8 +335,8 @@
                             </svg>
                         </div>
                         <div class="feature-text">
-                            <strong>多くのデバイスに対応</strong>
-                            <p>PCはもちろん、スマートフォンやタブレットのタッチ操作にも最適化。ピンチ操作によるタイムライン拡大にも対応します。</p>
+                            <strong>マルチデバイス＆クラウド同期</strong>
+                            <p>PCはもちろんスマホ・タブレットのタッチ操作にも最適化。軽量なルートデータのみをクラウド保存でき、別端末でもスムーズに作業を再開できます。</p>
                         </div>
                     </div>
 
@@ -302,12 +344,13 @@
                         <div class="feature-icon-box">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                                <circle cx="12" cy="8" r="6"></circle>
+                                <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>
                             </svg>
                         </div>
                         <div class="feature-text">
-                            <strong>ルートのクラウド保存</strong>
-                            <p>動画ファイルは外部へ送信せず完全に端末内で処理。作成したルートはクラウド保存でき、別の端末でも作業を再開できます。</p>
+                            <strong>無料で個人・商用利用可能</strong>
+                            <p>全機能を完全無料で利用可能。YouTube動画、SNS、商用コンテンツの映像制作にも制限なく活用いただけます。※概要欄等へのツール名/URLを明記してください</p>
                         </div>
                     </div>
                 </div>
@@ -611,7 +654,8 @@
             <!-- 右ペイン: Leaflet OSM 地図プレビュー -->
             <div class="map-pane">
                 <div class="map-header">
-                    <span class="map-title-label" style="font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                    <span class="map-title-label"
+                        style="font-weight: 600; display: flex; align-items: center; gap: 6px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
@@ -621,21 +665,24 @@
                         <span class="map-title-text">OpenStreetMap</span>
                     </span>
                     <div class="map-header-tools">
-                        <button type="button" id="btnToggleSideSearch" class="btn btn-secondary btn-sm btn-map-search-toggle" title="地図を検索">
+                        <button type="button" id="btnToggleSideSearch"
+                            class="btn btn-secondary btn-sm btn-map-search-toggle" title="地図を検索">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
                         </button>
-                        <button type="button" id="btnToggleMobileLayout" class="btn btn-secondary btn-sm btn-mobile-layout-toggle" title="レイアウト切替（左右並び / 上下並び）">
-                            <svg class="icon-split-horizontal" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <button type="button" id="btnToggleMobileLayout"
+                            class="btn btn-secondary btn-sm btn-mobile-layout-toggle" title="レイアウト切替（左右並び / 上下並び）">
+                            <svg class="icon-split-horizontal" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                 <line x1="12" y1="3" x2="12" y2="21"></line>
                             </svg>
-                            <svg class="icon-split-vertical" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                            <svg class="icon-split-vertical" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                style="display: none;">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                 <line x1="3" y1="12" x2="21" y2="12"></line>
                             </svg>
@@ -897,24 +944,82 @@
             <div class="modal-body">
                 <!-- 設定コントロールコンテナ (エクスポート開始時に非表示化) -->
                 <div id="exportSettingsContainer">
-                    <!-- セクション 1: 地図・カメラ設定 -->
-                    <div class="export-section">
-                        <div class="export-section-title">
+                    <!-- タブバー -->
+                    <div class="export-tabs" id="exportTabs">
+                        <button type="button" class="export-tab-btn active" id="tabBtnBasic" data-tab="basic">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-                                <line x1="8" y1="2" x2="8" y2="18"></line>
-                                <line x1="16" y1="6" x2="16" y2="22"></line>
+                                <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
                             </svg>
-                            <span>地図・縮尺設定</span>
+                            <span>基本・動画設定</span>
+                        </button>
+                        <button type="button" class="export-tab-btn" id="tabBtnDesign" data-tab="design">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
+                                <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
+                                <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
+                                <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
+                                <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
+                                <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
+                            </svg>
+                            <span>デザイン・表示設定</span>
+                        </button>
+                    </div>
+
+                    <!-- タブ 1: 基本・動画設定 -->
+                    <div class="export-tab-panel active" id="tabPanelBasic">
+                        <div class="form-group">
+                            <label class="form-label" for="exportFps">動画フレームレート (FPS)</label>
+                            <select id="exportFps" class="form-control">
+                                <option value="1">1 fps (超軽量)</option>
+                                <option value="2" selected>2 fps (推奨)</option>
+                                <option value="3">3 fps</option>
+                                <option value="4">4 fps</option>
+                                <option value="5">5 fps</option>
+                                <option value="6">6 fps</option>
+                                <option value="7">7 fps</option>
+                                <option value="8">8 fps</option>
+                                <option value="9">9 fps</option>
+                                <option value="10">10 fps (標準)</option>
+                                <option value="11">11 fps</option>
+                                <option value="12">12 fps</option>
+                                <option value="13">13 fps</option>
+                                <option value="14">14 fps</option>
+                                <option value="15">15 fps (最高画質)</option>
+                            </select>
                         </div>
                         <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="exportWipeShape">ワイプ形状</label>
+                                <select id="exportWipeShape" class="form-control">
+                                    <option value="circle">円形</option>
+                                    <option value="square">正方形</option>
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <label class="form-label" for="exportMapScale">文字・地図スケール</label>
                                 <select id="exportMapScale" class="form-control">
                                     <option value="2" selected>200% (大)</option>
                                     <option value="1.5">150% (中)</option>
                                     <option value="1">100% (標準)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- タブ 2: デザイン・表示設定 -->
+                    <div class="export-tab-panel" id="tabPanelDesign">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="exportChromaColor">背景色 (クロマキー)</label>
+                                <select id="exportChromaColor" class="form-control">
+                                    <option value="#00FF00">グリーンバック (#00FF00)</option>
+                                    <option value="#0000FF">ブルーバック (#0000FF)</option>
+                                    <option value="#FF00FF">マゼンタ (#FF00FF)</option>
+                                    <option value="#000000">ブラック (#000000)</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -928,43 +1033,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- セクション 2: デザイン・合成設定 -->
-                    <div class="export-section">
-                        <div class="export-section-title">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
-                                <line x1="7" y1="2" x2="7" y2="22"></line>
-                                <line x1="17" y1="2" x2="17" y2="22"></line>
-                                <line x1="2" y1="12" x2="22" y2="12"></line>
-                                <line x1="2" y1="7" x2="7" y2="7"></line>
-                                <line x1="2" y1="17" x2="7" y2="17"></line>
-                                <line x1="17" y1="17" x2="22" y2="17"></line>
-                                <line x1="17" y1="7" x2="22" y2="7"></line>
-                            </svg>
-                            <span>デザイン・合成設定</span>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label" for="exportWipeShape">ワイプ形状</label>
-                                <select id="exportWipeShape" class="form-control">
-                                    <option value="circle">円形</option>
-                                    <option value="square">正方形</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="exportChromaColor">背景色 (クロマキー)</label>
-                                <select id="exportChromaColor" class="form-control">
-                                    <option value="#00FF00">グリーンバック (#00FF00)</option>
-                                    <option value="#0000FF">ブルーバック (#0000FF)</option>
-                                    <option value="#FF00FF">マゼンタ (#FF00FF)</option>
-                                    <option value="#000000">ブラック (#000000)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0;">
+                        <div class="form-group">
                             <label class="form-label" for="exportMarkerColor">現在地マーカーの色</label>
                             <div style="display: flex; gap: 8px; align-items: center;">
                                 <select id="exportMarkerColor" class="form-control" style="flex: 1;">
@@ -981,31 +1050,20 @@
                                     title="マーカー色の詳細指定">
                             </div>
                         </div>
-                    </div>
-
-                    <!-- セクション 3: 表示要素 -->
-                    <div class="export-section">
-                        <div class="export-section-title">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="9 11 12 14 22 4"></polyline>
-                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                            </svg>
-                            <span>表示要素</span>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div
+                            style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color);">
                             <label
-                                style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                                style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
                                 <input type="checkbox" id="exportShowPins" checked>
                                 <span>通過地点（キーフレームピン）を描画する</span>
                             </label>
                             <label
-                                style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                                style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
                                 <input type="checkbox" id="exportShowScale" checked>
                                 <span>縮尺スケールバーを表示する (m/km)</span>
                             </label>
                             <label
-                                style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                                style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
                                 <input type="checkbox" id="exportShowRoute" checked>
                                 <span>これまでの移動軌跡を描画する</span>
                             </label>
@@ -1099,13 +1157,6 @@
                     <select id="settingPreviewQuality" class="form-control">
                         <option value="low">軽量 (低解像度)</option>
                         <option value="high">高画質 (オリジナル画質)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="settingFps">基準フレームレート (FPS)</label>
-                    <select id="settingFps" class="form-control">
-                        <option value="15" selected>15 fps</option>
-                        <option value="10">10 fps (軽量)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1413,7 +1464,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- アプリケーションモジュール -->
-    <script type="module" src="js/app.js?v=1.00d"></script>
+    <script type="module" src="js/app.js?v=1.00g"></script>
     <!-- トースト通知 -->
     <div id="vrmToast" class="vrm-toast">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

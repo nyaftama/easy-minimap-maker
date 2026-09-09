@@ -616,8 +616,9 @@ textarea {
     min-height: 240px;
     display: flex;
     background: var(--bg-darker);
-    overflow: hidden;
+    overflow: visible;
     position: relative;
+    z-index: 20;
 }
 
 /* 左側: 元動画プレビューペイン */
@@ -1615,7 +1616,8 @@ textarea {
         flex: 1;
         min-height: 0;
         flex-direction: column;
-        overflow: hidden;
+        overflow: visible;
+        z-index: 20;
     }
 
     .video-pane {
@@ -1639,7 +1641,8 @@ textarea {
         position: relative;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: visible;
+        z-index: 10;
     }
 
     .map-container {
@@ -2062,12 +2065,12 @@ textarea {
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: var(--radius-md);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-    max-height: 240px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 2px 8px rgba(0, 0, 0, 0.5);
+    max-height: min(320px, calc(100vh - 160px));
     overflow-y: auto;
     display: none;
     flex-direction: column;
-    z-index: 1001;
+    z-index: 3000;
 }
 
 .map-search-results.show {
@@ -2200,11 +2203,18 @@ textarea {
     .map-search-bar {
         left: 46px;
         width: calc(100% - 150px);
-        max-width: 200px;
+        max-width: 220px;
+        z-index: 2500;
     }
 
     .map-search-input {
         font-size: 11px;
+    }
+
+    .map-search-results {
+        min-width: 240px;
+        max-width: min(320px, calc(100vw - 32px));
+        box-shadow: 0 14px 35px rgba(0, 0, 0, 0.8), 0 4px 10px rgba(0, 0, 0, 0.5);
     }
 }
 /* ============================================================
@@ -3120,4 +3130,65 @@ button:disabled,
         flex-wrap: wrap;
         justify-content: center;
     }
+}
+
+/* ============================================================
+   エクスポートモーダル タブ切り替えスタイル (案B)
+   ============================================================ */
+.export-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    background: #f8fafc;
+    margin: -20px -20px 18px -20px;
+    padding: 0 16px;
+    gap: 8px;
+}
+
+.export-tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    font-family: inherit;
+}
+
+.export-tab-btn svg {
+    color: var(--text-muted);
+    transition: color 0.15s ease;
+}
+
+.export-tab-btn:hover {
+    color: var(--text-main);
+}
+
+.export-tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: #ffffff;
+}
+
+.export-tab-btn.active svg {
+    color: var(--primary-color);
+}
+
+.export-tab-panel {
+    display: none;
+}
+
+.export-tab-panel.active {
+    display: block;
+    animation: modalTabFadeIn 0.2s ease;
+}
+
+@keyframes modalTabFadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
 }

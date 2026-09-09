@@ -4,7 +4,7 @@
  * (非対応環境向け MediaRecorder フォールバック付き)
  */
 
-import { RouteInterpolator } from './interpolator.js?v=1.00d';
+import { RouteInterpolator } from './interpolator.js?v=1.00g';
 
 export class VideoExporter {
     constructor(renderEngine) {
@@ -127,7 +127,8 @@ export class VideoExporter {
             const timestampUs = Math.round(t * 1_000_000);
             const videoFrame = new VideoFrame(canvas, { timestamp: timestampUs });
 
-            const isKeyframe = (i % (fps * 2) === 0);
+            const keyframeInterval = Math.max(1, Math.round(fps * 2));
+            const isKeyframe = (i % keyframeInterval === 0);
             encoder.encode(videoFrame, { keyFrame: isKeyframe });
             videoFrame.close();
 
@@ -151,12 +152,16 @@ export class VideoExporter {
                         }
                     };
                 });
-            } else if (i % 6 === 0) {
-                // UI描画（進捗バー）更新とイベントループの解放
-                await new Promise(r => setTimeout(r, 0));
+            } else {
+                const yieldStep = Math.max(1, Math.min(6, Math.floor(totalFrames / 20)));
+                if (i % yieldStep === 0) {
+                    // UI描画（進捗バー）更新とイベントループの解放
+                    await new Promise(r => setTimeout(r, 0));
+                }
             }
 
-            if (onProgress && (i % 3 === 0 || i === totalFrames - 1)) {
+            const progressStep = Math.max(1, Math.min(3, Math.floor(totalFrames / 50)));
+            if (onProgress && (i % progressStep === 0 || i === totalFrames - 1)) {
                 const percent = 20 + Math.round(((i + 1) / totalFrames) * 75);
                 onProgress(percent, `動画エンコード中... (${i + 1}/${totalFrames} フレーム)`);
             }

@@ -7,14 +7,14 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=1.00d';
-import { VideoController } from './video-controller.js?v=1.00d';
-import { MapController } from './map-controller.js?v=1.00d';
-import { TimelineEditor } from './timeline-editor.js?v=1.00d';
-import { RenderEngine } from './render-engine.js?v=1.00d';
-import { VideoExporter } from './video-exporter.js?v=1.00d';
-import { ZipExporter } from './zip-exporter.js?v=1.00d';
-import { CloudStorage } from './cloud-storage.js?v=1.00d';
+import { state } from './state.js?v=1.00g';
+import { VideoController } from './video-controller.js?v=1.00g';
+import { MapController } from './map-controller.js?v=1.00g';
+import { TimelineEditor } from './timeline-editor.js?v=1.00g';
+import { RenderEngine } from './render-engine.js?v=1.00g';
+import { VideoExporter } from './video-exporter.js?v=1.00g';
+import { ZipExporter } from './zip-exporter.js?v=1.00g';
+import { CloudStorage } from './cloud-storage.js?v=1.00g';
 
 class App {
     constructor() {
@@ -468,18 +468,11 @@ class App {
         const btnClose = document.getElementById('btnCloseSettingsModal');
         const btnSave = document.getElementById('btnSaveSettings');
         const nameInput = document.getElementById('settingProjectName');
-        const fpsSelect = document.getElementById('settingFps');
         const qualitySelect = document.getElementById('settingPreviewQuality');
         const nameDisplay = document.getElementById('projectNameDisplay');
 
         btnOpen?.addEventListener('click', () => {
             if (nameInput) nameInput.value = state.projectName;
-            if (fpsSelect) {
-                if (!['15', '10'].includes(String(state.fps))) {
-                    state.fps = 15;
-                }
-                fpsSelect.value = String(state.fps);
-            }
             if (qualitySelect) qualitySelect.value = state.previewQuality || 'low';
             modal?.classList.add('open');
         });
@@ -493,9 +486,6 @@ class App {
             if (nameInput) {
                 state.projectName = nameInput.value.trim() || 'minimap-project';
                 if (nameDisplay) nameDisplay.textContent = state.projectName;
-            }
-            if (fpsSelect) {
-                state.fps = Number(fpsSelect.value);
             }
             if (qualitySelect) {
                 state.previewQuality = qualitySelect.value;
@@ -559,6 +549,30 @@ class App {
         const etaText = document.getElementById('exportEtaText');
         const exportSettingsContainer = document.getElementById('exportSettingsContainer');
 
+        // エクスポートモーダルのタブ切り替え (案B)
+        const tabBtnBasic = document.getElementById('tabBtnBasic');
+        const tabBtnDesign = document.getElementById('tabBtnDesign');
+        const tabPanelBasic = document.getElementById('tabPanelBasic');
+        const tabPanelDesign = document.getElementById('tabPanelDesign');
+
+        const switchExportTab = (tab) => {
+            if (tab === 'basic') {
+                tabBtnBasic?.classList.add('active');
+                tabBtnDesign?.classList.remove('active');
+                tabPanelBasic?.classList.add('active');
+                tabPanelDesign?.classList.remove('active');
+            } else {
+                tabBtnBasic?.classList.remove('active');
+                tabBtnDesign?.classList.add('active');
+                tabPanelBasic?.classList.remove('active');
+                tabPanelDesign?.classList.add('active');
+            }
+        };
+
+        tabBtnBasic?.addEventListener('click', () => switchExportTab('basic'));
+        tabBtnDesign?.addEventListener('click', () => switchExportTab('design'));
+
+        const exportFpsSelect = document.getElementById('exportFps');
         const shapeSelect = document.getElementById('exportWipeShape');
         const chromaSelect = document.getElementById('exportChromaColor');
         const mapScaleSelect = document.getElementById('exportMapScale');
@@ -596,6 +610,11 @@ class App {
             }
         };
 
+        exportFpsSelect?.addEventListener('change', (e) => {
+            const val = parseInt(e.target.value, 10);
+            state.exportSettings.fps = (val >= 1 && val <= 15) ? val : 2;
+        });
+
         markerColorSelect?.addEventListener('change', (e) => {
             const val = e.target.value;
             if (val === 'custom') {
@@ -622,6 +641,11 @@ class App {
                 return;
             }
             modal?.classList.add('open');
+            switchExportTab('basic');
+            if (exportFpsSelect) {
+                const curFps = state.exportSettings?.fps || 2;
+                exportFpsSelect.value = String(curFps);
+            }
             if (mapScaleSelect && state.exportSettings.mapScale) {
                 mapScaleSelect.value = String(state.exportSettings.mapScale);
             }
@@ -665,7 +689,8 @@ class App {
 
         btnStart?.addEventListener('click', async () => {
             const duration = state.videoDuration || (state.keyframes[state.keyframes.length - 1]?.time || 60);
-            const fps = state.fps || 15;
+            const chosenFps = exportFpsSelect ? parseInt(exportFpsSelect.value, 10) : (state.exportSettings?.fps || 2);
+            const fps = (chosenFps >= 1 && chosenFps <= 15) ? chosenFps : 2;
             let currentMarkerColor = '#2563eb';
             if (markerColorSelect && markerColorSelect.value !== 'custom') {
                 currentMarkerColor = markerColorSelect.value;
@@ -679,6 +704,7 @@ class App {
             const chosenZoom = exportZoomSelect ? parseInt(exportZoomSelect.value, 10) : 16;
             console.log('[VRM App] Starting export with markerColor:', currentMarkerColor, 'zoom:', chosenZoom);
             const settings = {
+                fps,
                 shape: shapeSelect?.value || 'circle',
                 chromaColor: chromaSelect?.value || '#00FF00',
                 showScale: checkScale ? checkScale.checked : true,
