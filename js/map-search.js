@@ -6,7 +6,7 @@
  * 3. OSM Photon API (施設名・海外地名・インクリメンタル補完)
  */
 
-import { getMunicipalityName } from './muni-data.js?v=1.01a';
+import { getMunicipalityName } from './muni-data.js?v=1.01b';
 
 /**
  * 日本の住所文字列から「都道府県＋市区町村」と「町名・詳細」を分離

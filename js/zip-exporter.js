@@ -3,8 +3,8 @@
  * GPX / GeoJSON / JSON 生成 & JSZip による一括ダウンロード
  */
 
-import { RouteInterpolator } from './interpolator.js?v=1.01a';
-import { saveOrShareFile } from './download-helper.js?v=1.01a';
+import { RouteInterpolator } from './interpolator.js?v=1.01b';
+import { saveOrShareFile } from './download-helper.js?v=1.01b';
 
 export class ZipExporter {
     /**

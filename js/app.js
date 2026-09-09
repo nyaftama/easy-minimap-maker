@@ -7,15 +7,15 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=1.01a';
-import { VideoController } from './video-controller.js?v=1.01a';
-import { MapController } from './map-controller.js?v=1.01a';
-import { TimelineEditor } from './timeline-editor.js?v=1.01a';
-import { RenderEngine } from './render-engine.js?v=1.01a';
-import { VideoExporter } from './video-exporter.js?v=1.01a';
-import { ZipExporter } from './zip-exporter.js?v=1.01a';
-import { CloudStorage } from './cloud-storage.js?v=1.01a';
-import { saveOrShareFile } from './download-helper.js?v=1.01a';
+import { state } from './state.js?v=1.01bb';
+import { VideoController } from './video-controller.js?v=1.01bb';
+import { MapController } from './map-controller.js?v=1.01bb';
+import { TimelineEditor } from './timeline-editor.js?v=1.01bb';
+import { RenderEngine } from './render-engine.js?v=1.01bb';
+import { VideoExporter } from './video-exporter.js?v=1.01bb';
+import { ZipExporter } from './zip-exporter.js?v=1.01bb';
+import { CloudStorage } from './cloud-storage.js?v=1.01bb';
+import { saveOrShareFile } from './download-helper.js?v=1.01bb';
 
 class App {
     constructor() {
@@ -609,7 +609,7 @@ class App {
 
         exportFpsSelect?.addEventListener('change', (e) => {
             const val = parseInt(e.target.value, 10);
-            state.exportSettings.fps = (val >= 1 && val <= 15) ? val : 2;
+            state.exportSettings.fps = (val >= 1 && val <= 30) ? val : 15;
         });
 
         markerColorSelect?.addEventListener('change', (e) => {
@@ -640,7 +640,7 @@ class App {
             modal?.classList.add('open');
             switchExportTab('basic');
             if (exportFpsSelect) {
-                const curFps = state.exportSettings?.fps || 2;
+                const curFps = state.exportSettings?.fps || 15;
                 exportFpsSelect.value = String(curFps);
             }
             if (mapScaleSelect && state.exportSettings.mapScale) {
@@ -686,8 +686,8 @@ class App {
 
         btnStart?.addEventListener('click', async () => {
             const duration = state.videoDuration || (state.keyframes[state.keyframes.length - 1]?.time || 60);
-            const chosenFps = exportFpsSelect ? parseInt(exportFpsSelect.value, 10) : (state.exportSettings?.fps || 2);
-            const fps = (chosenFps >= 1 && chosenFps <= 15) ? chosenFps : 2;
+            const chosenFps = exportFpsSelect ? parseInt(exportFpsSelect.value, 10) : (state.exportSettings?.fps || 15);
+            const fps = (chosenFps >= 1 && chosenFps <= 30) ? chosenFps : 15;
             let currentMarkerColor = '#2563eb';
             if (markerColorSelect && markerColorSelect.value !== 'custom') {
                 currentMarkerColor = markerColorSelect.value;

@@ -34,7 +34,7 @@ class ProjectState {
         this.exportSettings = {
             width: 720,
             height: 720,
-            fps: 2,                 // 出力動画フレームレート (1-15、デフォルト: 2)
+            fps: 15,                // 出力動画フレームレート (1-30、デフォルト: 15)
             shape: 'circle',        // "circle" | "square"
             chromaColor: '#00FF00', // クロマキー背景色
             showScale: true,        // 縮尺スケールバー表示
@@ -532,7 +532,7 @@ class ProjectState {
         };
         // 未設定時のフォールバック
         if (this.exportSettings.fps === undefined || this.exportSettings.fps === null) {
-            this.exportSettings.fps = 2;
+            this.exportSettings.fps = 15;
         }
         if (!this.exportSettings.markerColor) this.exportSettings.markerColor = '#2563eb';
         if (this.exportSettings.showPins === undefined) this.exportSettings.showPins = true;

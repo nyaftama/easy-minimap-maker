@@ -35,8 +35,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
     <!-- Application CSS -->
-    <link rel="stylesheet" href="css/style.css?v=1.01a">
-    <link rel="stylesheet" href="css/timeline.css?v=1.01a">
+    <link rel="stylesheet" href="css/style.css?v=1.01b">
+    <link rel="stylesheet" href="css/timeline.css?v=1.01b">
 </head>
 
 <body>
@@ -974,22 +974,18 @@
                         <div class="form-group">
                             <label class="form-label" for="exportFps">動画フレームレート (FPS)</label>
                             <select id="exportFps" class="form-control">
-                                <option value="1">1 fps (超軽量)</option>
-                                <option value="2" selected>2 fps (推奨)</option>
+                                <option value="1">1 fps</option>
+                                <option value="2">2 fps</option>
                                 <option value="3">3 fps</option>
                                 <option value="4">4 fps</option>
                                 <option value="5">5 fps</option>
-                                <option value="6">6 fps</option>
-                                <option value="7">7 fps</option>
-                                <option value="8">8 fps</option>
-                                <option value="9">9 fps</option>
-                                <option value="10">10 fps (標準)</option>
-                                <option value="11">11 fps</option>
-                                <option value="12">12 fps</option>
-                                <option value="13">13 fps</option>
-                                <option value="14">14 fps</option>
-                                <option value="15">15 fps (最高画質)</option>
+                                <option value="10">10 fps</option>
+                                <option value="15" selected>15 fps (標準)</option>
+                                <option value="20">20 fps</option>
+                                <option value="25">25 fps</option>
+                                <option value="30">30 fps</option>
                             </select>
+                            <span class="form-hint">FPSを高く設定すると動きが滑らかになりますが、エクスポート処理時間が長くなります。</span>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
@@ -1464,7 +1460,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- アプリケーションモジュール -->
-    <script type="module" src="js/app.js?v=1.01a"></script>
+    <script type="module" src="js/app.js?v=1.01b"></script>
     <!-- トースト通知 -->
     <div id="vrmToast" class="vrm-toast">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
