@@ -7,14 +7,14 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=1.00a';
-import { VideoController } from './video-controller.js?v=1.00a';
-import { MapController } from './map-controller.js?v=1.00a';
-import { TimelineEditor } from './timeline-editor.js?v=1.00a';
-import { RenderEngine } from './render-engine.js?v=1.00a';
-import { VideoExporter } from './video-exporter.js?v=1.00a';
-import { ZipExporter } from './zip-exporter.js?v=1.00a';
-import { CloudStorage } from './cloud-storage.js?v=1.00a';
+import { state } from './state.js?v=1.00b';
+import { VideoController } from './video-controller.js?v=1.00b';
+import { MapController } from './map-controller.js?v=1.00b';
+import { TimelineEditor } from './timeline-editor.js?v=1.00b';
+import { RenderEngine } from './render-engine.js?v=1.00b';
+import { VideoExporter } from './video-exporter.js?v=1.00b';
+import { ZipExporter } from './zip-exporter.js?v=1.00b';
+import { CloudStorage } from './cloud-storage.js?v=1.00b';
 
 class App {
     constructor() {
@@ -914,13 +914,33 @@ class App {
             }
             if (errorMsg) errorMsg.style.display = 'none';
             if (successMsg) successMsg.style.display = 'none';
-            if (emailInput) emailInput.value = '';
-            if (passwordInput) passwordInput.value = '';
+
+            // モーダルを開いた時だけ入力を活性化
+            if (emailInput) {
+                emailInput.disabled = false;
+                emailInput.value = '';
+            }
+            if (passwordInput) {
+                passwordInput.disabled = false;
+                passwordInput.value = '';
+                passwordInput.autocomplete = isLoginMode ? 'current-password' : 'new-password';
+            }
             modal?.classList.add('open');
+            setTimeout(() => emailInput?.focus(), 50);
         };
 
         const closeAuthModal = () => {
             modal?.classList.remove('open');
+            // 入力フィールドをクリア＆非活性化してブラウザのオートフィル保留キャッシュから切り離す
+            if (emailInput) {
+                emailInput.value = '';
+                emailInput.disabled = true;
+            }
+            if (passwordInput) {
+                passwordInput.value = '';
+                passwordInput.disabled = true;
+            }
+            form?.reset();
         };
 
         btnStartLogin?.addEventListener('click', () => openAuthModal(true));
@@ -989,6 +1009,19 @@ class App {
             try {
                 if (isLoginMode) {
                     await this.cloudStorage.signInWithPassword(email, password);
+                    // ログイン成功時にパスワード保存ダイアログをその場で表示させる
+                    if (window.PasswordCredential && navigator.credentials?.store) {
+                        try {
+                            const cred = new PasswordCredential({
+                                id: email,
+                                password: password,
+                                name: email
+                            });
+                            await navigator.credentials.store(cred);
+                        } catch (credErr) {
+                            // 環境依存の制限は無視
+                        }
+                    }
                     closeAuthModal();
                 } else {
                     const res = await this.cloudStorage.signUpWithPassword(email, password);
@@ -998,6 +1031,18 @@ class App {
                             successMsg.style.display = 'block';
                         }
                     } else {
+                        if (window.PasswordCredential && navigator.credentials?.store) {
+                            try {
+                                const cred = new PasswordCredential({
+                                    id: email,
+                                    password: password,
+                                    name: email
+                                });
+                                await navigator.credentials.store(cred);
+                            } catch (credErr) {
+                                // 環境依存の制限は無視
+                            }
+                        }
                         closeAuthModal();
                     }
                 }

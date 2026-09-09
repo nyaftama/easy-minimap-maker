@@ -930,6 +930,16 @@ textarea {
 /* ============================================================
    モーダルダイアログ
    ============================================================ */
+@keyframes modalBackdropFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalContentPopIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .modal-backdrop {
     position: fixed;
     top: 0;
@@ -938,18 +948,17 @@ textarea {
     height: 100vh;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
 }
 
 .modal-backdrop.open {
-    opacity: 1;
+    display: flex;
     pointer-events: auto;
+    animation: modalBackdropFadeIn 0.2s ease forwards;
 }
 
 .modal-content {
@@ -961,12 +970,10 @@ textarea {
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: var(--shadow-dark);
-    transform: translateY(10px);
-    transition: transform 0.2s ease;
 }
 
 .modal-backdrop.open .modal-content {
-    transform: translateY(0);
+    animation: modalContentPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .modal-header {
