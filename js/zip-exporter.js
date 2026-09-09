@@ -3,7 +3,7 @@
  * GPX / GeoJSON / JSON 生成 & JSZip による一括ダウンロード
  */
 
-import { RouteInterpolator } from './interpolator.js?v=1.00c';
+import { RouteInterpolator } from './interpolator.js?v=1.00d';
 
 export class ZipExporter {
     /**

@@ -6,6 +6,55 @@
  * 3. OSM Photon API (施設名・海外地名・インクリメンタル補完)
  */
 
+import { getMunicipalityName } from './muni-data.js?v=1.00d';
+
+/**
+ * 日本の住所文字列から「都道府県＋市区町村」と「町名・詳細」を分離
+ * @param {string} fullAddress 例: "新潟県長岡市中央公園", "東京都中央区八重洲一丁目"
+ */
+function parseAddressParts(fullAddress) {
+    if (!fullAddress || typeof fullAddress !== 'string') return null;
+    const str = fullAddress.trim();
+
+    // 1. 都道府県の検出 (1都1道2府43県)
+    const prefMatch = str.match(/^(東京都|北海道|(?:京都|大阪)府|.{2,3}県)/);
+    if (!prefMatch) return null;
+
+    const pref = prefMatch[1];
+    const restAfterPref = str.slice(pref.length);
+
+    // 2. 市区町村の検出
+    // パターン1: 郡 + 町村 (例: 西多摩郡日の出町)
+    // パターン2: 市 + 区 (政令指定都市 例: 札幌市中央区, 横浜市中区)
+    // パターン3: 単独の 市 / 区 / 町 / 村
+    let city = '';
+    let town = '';
+
+    const gunMatch = restAfterPref.match(/^(.+?郡.+?[町村])/);
+    const seireiMatch = restAfterPref.match(/^(.+?市.+?区)/);
+    const normalMatch = restAfterPref.match(/^(.+?[市区町村])/);
+
+    if (gunMatch) {
+        city = gunMatch[1];
+        town = restAfterPref.slice(city.length);
+    } else if (seireiMatch) {
+        city = seireiMatch[1];
+        town = restAfterPref.slice(city.length);
+    } else if (normalMatch) {
+        city = normalMatch[1];
+        town = restAfterPref.slice(city.length);
+    } else {
+        town = restAfterPref;
+    }
+
+    return {
+        pref,
+        city,
+        municipality: `${pref}${city}`,
+        town: town || fullAddress
+    };
+}
+
 export class MapSearch {
     constructor(options = {}) {
         this.container = options.container || document.getElementById('mapSearchBar');
@@ -250,12 +299,37 @@ export class MapSearch {
 
             return filteredData.map(item => {
                 const [lng, lat] = item.geometry.coordinates;
+                const title = item.properties?.title || '';
+                const code = item.properties?.addressCode || '';
+
+                let name = title;
+                let subtext = '';
+
+                // 1. addressCode（JISコード）から都道府県・市区町村名を取得
+                const muniFromCode = getMunicipalityName(code);
+
+                // 2. title から都道府県・市区町村・町名をパース
+                const parsed = parseAddressParts(title);
+
+                if (parsed && parsed.municipality) {
+                    subtext = parsed.municipality;
+                    if (parsed.town && parsed.town !== title) {
+                        name = parsed.town;
+                    }
+                } else if (muniFromCode) {
+                    subtext = muniFromCode;
+                    name = title;
+                } else {
+                    subtext = '日本';
+                }
+
                 return {
-                    name: item.properties.title,
-                    subtext: '国土地理院 住所・地名データ',
+                    name,
+                    subtext, // 都道府県と市区町村名を表示
                     lat,
                     lng,
-                    source: 'gsi'
+                    source: 'gsi',
+                    rawTitle: title
                 };
             });
         } catch (e) {
@@ -278,10 +352,25 @@ export class MapSearch {
             return data.features.map(f => {
                 const [lng, lat] = f.geometry.coordinates;
                 const p = f.properties;
-                const subParts = [p.district, p.city, p.state, p.country].filter(Boolean);
+
+                let subtext = '';
+                if (p.countrycode === 'JP' || p.country === '日本') {
+                    // 日本国内: 都道府県 → 市区町村 の順で構築
+                    const parts = [];
+                    if (p.state) parts.push(p.state);
+                    if (p.city && !parts.includes(p.city)) parts.push(p.city);
+                    if (p.district && !parts.includes(p.district)) parts.push(p.district);
+                    if (p.locality && !parts.includes(p.locality)) parts.push(p.locality);
+                    subtext = parts.join(' ') || p.country || '日本';
+                } else {
+                    // 海外: 都市, 州, 国
+                    const parts = [p.city, p.state, p.country].filter(Boolean);
+                    subtext = parts.join(', ') || '海外';
+                }
+
                 return {
                     name: p.name || p.street || '名称未設定',
-                    subtext: subParts.join(', ') || 'OpenStreetMap',
+                    subtext, // 都道府県と市区町村名を表示
                     lat,
                     lng,
                     source: 'osm'
@@ -334,12 +423,12 @@ export class MapSearch {
             if (seenCoords.has(coordKey)) continue;
 
             const isDuplicateNearby = results.some(existing => {
-                if (existing.name === item.name) {
-                    const dLat = Math.abs(existing.lat - item.lat);
-                    const dLng = Math.abs(existing.lng - item.lng);
-                    return dLat < 0.015 && dLng < 0.015; // 約1.5km以内
-                }
-                return false;
+                const sameName = (existing.name === item.name) ||
+                    (existing.rawTitle && existing.rawTitle.includes(item.name)) ||
+                    (item.rawTitle && item.rawTitle.includes(existing.name));
+                const dLat = Math.abs(existing.lat - item.lat);
+                const dLng = Math.abs(existing.lng - item.lng);
+                return (sameName && dLat < 0.015 && dLng < 0.015) || (dLat < 0.003 && dLng < 0.003);
             });
 
             if (isDuplicateNearby) continue;
