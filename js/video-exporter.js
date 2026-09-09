@@ -1,10 +1,10 @@
 /**
  * video-exporter.js
  * WebCodecs API (VideoEncoder) + mp4-muxer による超高速 720x720 MP4 エクスポート
- * (非対応環境向け MediaRecorder フォールバック付き)
+ * (Safari/iOS対応 & 非対応環境向け MediaRecorder フォールバック付き)
  */
 
-import { RouteInterpolator } from './interpolator.js?v=1.00g';
+import { RouteInterpolator } from './interpolator.js?v=1.01';
 
 export class VideoExporter {
     constructor(renderEngine) {
@@ -17,8 +17,8 @@ export class VideoExporter {
      * 動画エクスポート処理の実行
      * @param {Array} keyframes - 全キーフレーム
      * @param {number} duration - 動画時間長（秒）
-     * @param {number} fps - 出力フレームレート (例: 30)
-     * @param {Object} settings - { shape, chromaColor, showScale, showRoute, showPins, markerColor, mapScale }
+     * @param {number} fps - 出力フレームレート (例: 2, 10, 15)
+     * @param {Object} settings - { shape, chromaColor, showScale, showRoute, showPins, markerColor, mapScale, zoom }
      * @param {Function} onProgress - (percent, statusText) => void
      * @returns {Promise<Blob>} 出力動画Blob (MP4 / WebM)
      */
@@ -43,11 +43,10 @@ export class VideoExporter {
             showPins: settings.showPins
         });
 
-        // 現在地マーカー画像の事前生成 (案A: 編集画面と同一のSVGスタンプを生成)
+        // 現在地マーカー画像 & ピン画像の事前生成 (編集画面と同一のSVGスタンプを生成)
         const currentMarkerColor = settings.markerColor || '#2563eb';
         await this.renderEngine.prepareMarker(currentMarkerColor);
 
-        // キーフレームピン画像の事前生成 (案A: 編集画面と同一のSVGスタンプを生成)
         if (settings.showPins !== false) {
             await this.renderEngine.preparePins(keyframes, settings.mapScale || 2.0);
         }
@@ -63,7 +62,7 @@ export class VideoExporter {
             try {
                 return await this.exportWithWebCodecs(keyframes, duration, fps, settings, onProgress);
             } catch (err) {
-                console.warn('WebCodecs export failed, falling back to MediaRecorder:', err);
+                console.warn('[VideoExporter] WebCodecs export failed, falling back to MediaRecorder:', err);
             }
         }
 
@@ -71,7 +70,7 @@ export class VideoExporter {
         return await this.exportWithMediaRecorder(keyframes, duration, fps, settings, onProgress);
     }
 
-    /** WebCodecs + mp4-muxer による高速書き出し */
+    /** WebCodecs + mp4-muxer による高速書き出し (Safari/Chrome双方に対応) */
     async exportWithWebCodecs(keyframes, duration, fps, settings, onProgress) {
         // mp4-muxer の動的インポート
         let Mp4MuxerModule;
@@ -93,18 +92,94 @@ export class VideoExporter {
             fastStart: 'in-memory'
         });
 
+        let encoderError = null;
+        const defaultDurationUs = Math.round(1_000_000 / fps);
+        let cachedDecoderConfig = null;
+
         const encoder = new VideoEncoder({
-            output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
-            error: (e) => console.error('VideoEncoder error:', e)
+            output: (chunk, meta) => {
+                try {
+                    // Safari互換性対策:
+                    // 1. Safariでは初回チャンク以外metaが来ない。またcolorSpaceが未定義の場合があるため補完
+                    let activeMeta = meta;
+                    if (meta && meta.decoderConfig) {
+                        cachedDecoderConfig = meta.decoderConfig;
+                    } else if (cachedDecoderConfig) {
+                        activeMeta = { ...meta, decoderConfig: cachedDecoderConfig };
+                    }
+
+                    if (activeMeta && activeMeta.decoderConfig && !activeMeta.decoderConfig.colorSpace) {
+                        activeMeta.decoderConfig.colorSpace = {
+                            primaries: 'bt709',
+                            transfer: 'bt709',
+                            matrix: 'bt709',
+                            fullRange: false
+                        };
+                    }
+
+                    // 2. SafariのVideoEncoderはchunk.durationを返さない(null/undefined)。
+                    //    mp4-muxerのaddVideoChunkRawに明示的な1フレームの長さ(マイクロ秒)を渡す。
+                    const rawData = new Uint8Array(chunk.byteLength);
+                    chunk.copyTo(rawData);
+
+                    const durationUs = (Number.isFinite(chunk.duration) && chunk.duration >= 0)
+                        ? chunk.duration
+                        : defaultDurationUs;
+
+                    muxer.addVideoChunkRaw(
+                        rawData,
+                        chunk.type,
+                        chunk.timestamp,
+                        durationUs,
+                        activeMeta
+                    );
+                } catch (muxErr) {
+                    console.error('[VideoExporter] mp4-muxer error:', muxErr);
+                    encoderError = muxErr;
+                }
+            },
+            error: (e) => {
+                console.error('[VideoEncoder] Encoder error callback:', e);
+                encoderError = e;
+            }
         });
 
+        // 複数のコーデック候補（Safari/Chromium双方の互換性を考慮）
+        const candidateCodecs = [
+            'avc1.42001f', // Baseline Profile Level 3.1
+            'avc1.4d001f', // Main Profile Level 3.1
+            'avc1.64001f'  // High Profile Level 3.1
+        ];
+
+        let chosenCodec = 'avc1.42001f';
+        if (typeof VideoEncoder.isConfigSupported === 'function') {
+            for (const c of candidateCodecs) {
+                try {
+                    const testConf = {
+                        codec: c,
+                        width: 720,
+                        height: 720,
+                        bitrate: 3_500_000,
+                        framerate: fps
+                    };
+                    const res = await VideoEncoder.isConfigSupported(testConf);
+                    if (res && res.supported) {
+                        chosenCodec = c;
+                        break;
+                    }
+                } catch (e) {
+                    console.warn('[VideoExporter] isConfigSupported check failed for ' + c, e);
+                }
+            }
+        }
+
         const encoderConfig = {
-            codec: 'avc1.42001f', // H.264 Baseline / Main Profile
+            codec: chosenCodec,
             width: 720,
             height: 720,
-            bitrate: 3_500_000,   // 3.5 Mbps (720p 10-15fpsに十分すぎる高画質)
+            bitrate: 3_500_000,
             framerate: fps,
-            hardwareAcceleration: 'prefer-hardware', // GPUハードウェアエンコーダを優先
+            hardwareAcceleration: 'prefer-hardware',
             latencyMode: 'quality'
         };
 
@@ -120,6 +195,10 @@ export class VideoExporter {
         const totalFrames = Math.ceil(duration * fps);
 
         for (let i = 0; i < totalFrames; i++) {
+            if (encoderError) {
+                throw new Error('VideoEncoder failed during encoding: ' + (encoderError.message || encoderError));
+            }
+
             const t = i / fps;
             const currentPos = RouteInterpolator.interpolate(keyframes, t) || keyframes[0];
             const canvas = this.renderEngine.renderFrame(currentPos, keyframes, t, settings);
@@ -163,7 +242,7 @@ export class VideoExporter {
             const progressStep = Math.max(1, Math.min(3, Math.floor(totalFrames / 50)));
             if (onProgress && (i % progressStep === 0 || i === totalFrames - 1)) {
                 const percent = 20 + Math.round(((i + 1) / totalFrames) * 75);
-                onProgress(percent, `動画エンコード中... (${i + 1}/${totalFrames} フレーム)`);
+                onProgress(percent, );
             }
         }
 
@@ -214,7 +293,7 @@ export class VideoExporter {
                 currentFrame++;
                 if (onProgress && currentFrame % 10 === 0) {
                     const percent = 20 + Math.round((currentFrame / totalFrames) * 75);
-                    onProgress(percent, `レンダリング中... (${currentFrame}/${totalFrames})`);
+                    onProgress(percent, );
                 }
 
                 if (currentFrame >= totalFrames) {

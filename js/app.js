@@ -7,14 +7,14 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=1.00g';
-import { VideoController } from './video-controller.js?v=1.00g';
-import { MapController } from './map-controller.js?v=1.00g';
-import { TimelineEditor } from './timeline-editor.js?v=1.00g';
-import { RenderEngine } from './render-engine.js?v=1.00g';
-import { VideoExporter } from './video-exporter.js?v=1.00g';
-import { ZipExporter } from './zip-exporter.js?v=1.00g';
-import { CloudStorage } from './cloud-storage.js?v=1.00g';
+import { state } from './state.js?v=1.01';
+import { VideoController } from './video-controller.js?v=1.01';
+import { MapController } from './map-controller.js?v=1.01';
+import { TimelineEditor } from './timeline-editor.js?v=1.01';
+import { RenderEngine } from './render-engine.js?v=1.01';
+import { VideoExporter } from './video-exporter.js?v=1.01';
+import { ZipExporter } from './zip-exporter.js?v=1.01';
+import { CloudStorage } from './cloud-storage.js?v=1.01';
 
 class App {
     constructor() {
@@ -1495,6 +1495,20 @@ class App {
     // ============================================================
     // 汎用ダイアログモーダルシステム (alert / confirm の代替)
     // ============================================================
+
+        /** トースト通知を表示 (静的ユーティリティ) */
+    static showToast(message) {
+        const toast = document.getElementById('vrmToast');
+        const toastText = document.getElementById('vrmToastText');
+        if (toast && toastText) {
+            toastText.textContent = message || '';
+            toast.classList.add('show');
+            if (window._appToastTimer) clearTimeout(window._appToastTimer);
+            window._appToastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    }
 
     static showModalAlert(message, title = 'お知らせ', type = 'info') {
         return new Promise((resolve) => {
