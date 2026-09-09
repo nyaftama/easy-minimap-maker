@@ -8,9 +8,9 @@
  * - ピン近傍ポップアップ (削除 / 現在時刻にコピー追加 / 時刻ジャンプ)
  */
 
-import { state } from './state.js?v=1.00b';
-import { RouteInterpolator } from './interpolator.js?v=1.00b';
-import { MapSearch } from './map-search.js?v=1.00b';
+import { state } from './state.js?v=1.00c';
+import { RouteInterpolator } from './interpolator.js?v=1.00c';
+import { MapSearch } from './map-search.js?v=1.00c';
 
 export class MapController {
     constructor(containerId = 'leafletMap') {
@@ -105,6 +105,86 @@ export class MapController {
     initEvents() {
         document.getElementById('btnFitBounds')?.addEventListener('click', () => this.fitBounds());
         document.getElementById('btnCenterCurrent')?.addEventListener('click', () => this.centerCurrent());
+
+        // スマートフォン向けレイアウト切替（上下分割 / 左右分割）
+        const btnToggleLayout = document.getElementById('btnToggleMobileLayout');
+        const workspaceTop = document.querySelector('.workspace-top');
+
+        // 保存されたレイアウト設定の復元
+        try {
+            const savedLayout = localStorage.getItem('vrm_mobile_layout');
+            if (savedLayout === 'side-by-side' && workspaceTop) {
+                workspaceTop.classList.add('mobile-side-by-side');
+                if (btnToggleLayout) btnToggleLayout.title = '上下並びに切替';
+            }
+        } catch (e) {
+            // ignore
+        }
+
+        btnToggleLayout?.addEventListener('click', () => {
+            const isSideBySide = workspaceTop?.classList.toggle('mobile-side-by-side');
+            if (btnToggleLayout) {
+                btnToggleLayout.title = isSideBySide ? '上下並びに切替' : '左右並びに切替';
+            }
+            try {
+                localStorage.setItem('vrm_mobile_layout', isSideBySide ? 'side-by-side' : 'stacked');
+            } catch (e) {
+                // ignore
+            }
+
+            // レイアウト切替時は一時検索バーを閉じる
+            closeSideSearch();
+
+            // 地図描画崩れ防止のリサイズ再計算
+            requestAnimationFrame(() => {
+                this.map?.invalidateSize();
+            });
+            setTimeout(() => {
+                this.map?.invalidateSize();
+            }, 150);
+        });
+
+        // 横並び表示時の検索ボタントグル ＆ 一時表示コントロール
+        const btnToggleSearch = document.getElementById('btnToggleSideSearch');
+        const searchBar = document.getElementById('mapSearchBar');
+        const searchInput = document.getElementById('mapSearchInput');
+        const btnSearchClose = document.getElementById('btnMapSearchClose');
+
+        const openSideSearch = () => {
+            if (!searchBar) return;
+            searchBar.classList.add('temporary-open');
+            setTimeout(() => {
+                searchInput?.focus();
+            }, 50);
+        };
+
+        const closeSideSearch = () => {
+            if (!searchBar) return;
+            searchBar.classList.remove('temporary-open');
+            this.mapSearch?.clearResults();
+            searchInput?.blur();
+        };
+
+        btnToggleSearch?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (searchBar?.classList.contains('temporary-open')) {
+                closeSideSearch();
+            } else {
+                openSideSearch();
+            }
+        });
+
+        btnSearchClose?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeSideSearch();
+        });
+
+        // 検索結果選択時に一時検索バーを閉じる
+        const originalHandleSearchResult = this.handleSearchResult.bind(this);
+        this.handleSearchResult = (item) => {
+            originalHandleSearchResult(item);
+            closeSideSearch();
+        };
 
         // ポップアップ内「この地点でキーフレームを追加」ボタンのクリック委任
         document.addEventListener('click', (e) => {

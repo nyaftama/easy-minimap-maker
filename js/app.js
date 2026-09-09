@@ -7,14 +7,14 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=1.00b';
-import { VideoController } from './video-controller.js?v=1.00b';
-import { MapController } from './map-controller.js?v=1.00b';
-import { TimelineEditor } from './timeline-editor.js?v=1.00b';
-import { RenderEngine } from './render-engine.js?v=1.00b';
-import { VideoExporter } from './video-exporter.js?v=1.00b';
-import { ZipExporter } from './zip-exporter.js?v=1.00b';
-import { CloudStorage } from './cloud-storage.js?v=1.00b';
+import { state } from './state.js?v=1.00c';
+import { VideoController } from './video-controller.js?v=1.00c';
+import { MapController } from './map-controller.js?v=1.00c';
+import { TimelineEditor } from './timeline-editor.js?v=1.00c';
+import { RenderEngine } from './render-engine.js?v=1.00c';
+import { VideoExporter } from './video-exporter.js?v=1.00c';
+import { ZipExporter } from './zip-exporter.js?v=1.00c';
+import { CloudStorage } from './cloud-storage.js?v=1.00c';
 
 class App {
     constructor() {

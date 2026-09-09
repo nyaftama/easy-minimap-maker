@@ -783,6 +783,33 @@ textarea {
     flex-shrink: 0;
 }
 
+/* モバイル向けヘッダーボタン (デスクトップでは非表示) */
+#btnToggleSideSearch,
+#btnToggleMobileLayout {
+    display: none;
+}
+
+.map-search-close-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-light);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: 2px;
+    transition: var(--transition);
+}
+
+.map-search-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
 .map-header-tools {
     display: flex;
     align-items: center;
@@ -1450,6 +1477,139 @@ textarea {
         font-size: 13px;
     }
 
+
+    /* モバイル環境でのレイアウト切替ボタン表示 */
+    #btnToggleMobileLayout {
+        display: inline-flex;
+    }
+
+    /* 横並び表示時の検索ボタントグル (1番目にアイコンのみ表示) */
+    .workspace-top.mobile-side-by-side #btnToggleSideSearch {
+        display: inline-flex !important;
+    }
+
+    /* 横並び表示時: 通常配置の検索ボックスは非表示 */
+    .workspace-top.mobile-side-by-side .map-search-bar {
+        display: none !important;
+    }
+
+    /* 横並び表示時: 検索ボタンタップで一時表示される検索ボックス */
+    @keyframes searchBarModalPop {
+        from {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .workspace-top.mobile-side-by-side .map-search-bar.temporary-open {
+        display: flex !important;
+        position: absolute !important;
+        top: 8px !important;
+        left: 8px !important;
+        right: 8px !important;
+        width: calc(100% - 16px) !important;
+        max-width: none !important;
+        z-index: 2500 !important;
+        animation: searchBarModalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .workspace-top.mobile-side-by-side .map-search-bar.temporary-open .map-search-input-wrapper {
+        background: rgba(18, 22, 30, 0.98);
+        border-color: var(--primary-color);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(59, 130, 246, 0.3);
+        height: 38px;
+        padding: 0 8px;
+    }
+
+    .workspace-top.mobile-side-by-side .map-search-bar.temporary-open .map-search-close-btn {
+        display: flex !important;
+    }
+
+    /* スマートフォンでの左右分割レイアウト */
+    .workspace-top.mobile-side-by-side {
+        flex-direction: row !important;
+    }
+
+    .workspace-top.mobile-side-by-side .video-pane {
+        flex: 1 1 50% !important;
+        width: 50% !important;
+        max-width: 50% !important;
+        min-width: 0 !important;
+        border-right: 1px solid var(--panel-border) !important;
+        border-bottom: none !important;
+    }
+
+    .workspace-top.mobile-side-by-side .map-pane {
+        flex: 1 1 50% !important;
+        width: 50% !important;
+        max-width: 50% !important;
+        min-width: 0 !important;
+    }
+
+    /* 左右並び時: ヘッダーの「OpenStreetMap」文字を非表示 */
+    .workspace-top.mobile-side-by-side .map-title-text {
+        display: none !important;
+    }
+
+    /* 左右並び時: map-header-tools 内のボタンをアイコンのみにする */
+    .workspace-top.mobile-side-by-side .map-header-tools .btn span,
+    .workspace-top.mobile-side-by-side #btnFitBounds span,
+    .workspace-top.mobile-side-by-side #btnCenterCurrent span,
+    .workspace-top.mobile-side-by-side #btnToggleMobileLayout span {
+        display: none !important;
+    }
+
+    .workspace-top.mobile-side-by-side .map-header-tools {
+        gap: 4px !important;
+    }
+
+    .workspace-top.mobile-side-by-side .map-header-tools .btn {
+        padding: 4px 6px !important;
+        min-height: 26px !important;
+    }
+
+    /* 左右並び時: 切替ボタンのアイコンを上下分割アイコンに変更 */
+    .workspace-top.mobile-side-by-side #btnToggleMobileLayout .icon-split-horizontal {
+        display: none !important;
+    }
+
+    .workspace-top.mobile-side-by-side #btnToggleMobileLayout .icon-split-vertical {
+        display: inline-block !important;
+    }
+
+    /* 左右並び時: 動画コントロールバーをコンパクト化 */
+    .workspace-top.mobile-side-by-side .video-control-bar {
+        padding: 4px !important;
+        min-height: 38px !important;
+        gap: 3px !important;
+    }
+
+    .workspace-top.mobile-side-by-side .timecode-display {
+        font-size: 10px !important;
+        min-width: 0 !important;
+        padding: 1px 3px !important;
+    }
+
+    .workspace-top.mobile-side-by-side .jog-shuttle {
+        max-width: 70px !important;
+        height: 24px !important;
+    }
+
+    .workspace-top.mobile-side-by-side .video-step-controls {
+        gap: 2px !important;
+    }
+
+    .workspace-top.mobile-side-by-side .btn-ctrl {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 9px !important;
+        padding: 0 !important;
+    }
+
     /* 画面比率: 画面内クランプ (動画 + マップ + タイムライン操作群) */
     .workspace-top {
         flex: 1;
@@ -1504,7 +1664,7 @@ textarea {
         z-index: 5;
     }
 
-    .map-header-tools {
+.map-header-tools {
         position: static;
         display: flex;
         align-items: center;

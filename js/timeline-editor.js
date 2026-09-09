@@ -8,7 +8,7 @@
  * - 最大10世代の Undo / Redo
  */
 
-import { state } from './state.js?v=1.00b';
+import { state } from './state.js?v=1.00c';
 
 export class TimelineEditor {
     constructor(videoController) {
