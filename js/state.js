@@ -7,7 +7,7 @@
  * - 一時停止作成中の自動保存保留と完了時の即時保存
  */
 
-export const APP_VERSION = '0.91';
+export const APP_VERSION = '1.01c';
 const STORAGE_KEY = 'vrm_draft_project_v1';
 
 class ProjectState {
@@ -521,11 +521,30 @@ class ProjectState {
 
     restoreDraft(draft) {
         if (!draft) return;
+        if (typeof draft === 'string') {
+            try {
+                draft = JSON.parse(draft);
+            } catch (e) {
+                console.error('Failed to parse draft string:', e);
+                return;
+            }
+        }
         this.projectName = draft.projectName || 'minimap-project';
         this.fps = 30; // タイムラインFPSは30固定
         this.videoFileName = draft.videoFileName || '';
-        this.videoDuration = draft.videoDuration || 0;
-        this.keyframes = draft.keyframes || [];
+        this.videoDuration = Number(draft.videoDuration) || 0;
+        this.currentTime = 0;
+        this.selectedIds.clear();
+
+        // キーフレーム配列の型・値の安全な正規化
+        this.keyframes = Array.isArray(draft.keyframes) ? draft.keyframes.map(k => ({
+            ...k,
+            time: Number(k.time) || 0,
+            lat: Number(k.lat) || 0,
+            lng: Number(k.lng) || 0,
+            zoom: Number(k.zoom) || 16
+        })) : [];
+
         this.exportSettings = {
             ...this.exportSettings,
             ...(draft.exportSettings || {})
@@ -539,6 +558,8 @@ class ProjectState {
         this.previewQuality = draft.previewQuality || 'low';
         this.isPausing = draft.isPausing || false;
         this.pendingPauseStartId = draft.pendingPauseStartId || null;
+        this.undoStack = [];
+        this.redoStack = [];
 
         this.sortKeyframes();
         this.notify('keyframes_updated');

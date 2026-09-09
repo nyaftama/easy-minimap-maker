@@ -3,7 +3,7 @@
  * 動画再生制御・フレーム移動・ジョグスクラバー・軽量プレビューレンダリング
  */
 
-import { state } from './state.js?v=1.01b';
+import { state } from './state.js?v=1.01c';
 
 export class VideoController {
     constructor(videoEl, options = {}) {
@@ -135,6 +135,14 @@ export class VideoController {
 
         // ジョグダイヤル・スクラバー (マウス & タッチ対応)
         this.initJogScrubber();
+
+        // プロジェクト状態の復元・変更を購読して表示を自動同期
+        state.subscribe((eventType) => {
+            if (eventType === 'project_restored' || eventType === 'project_reset' || eventType === 'keyframes_updated') {
+                this.updateTimeDisplay();
+                this.updatePlayBtn();
+            }
+        });
     }
 
     /** キーボードショートカットの全面強化 */
@@ -216,6 +224,9 @@ export class VideoController {
     }
 
     togglePlay() {
+        if (!this.video.src || this.video.readyState === 0) {
+            return;
+        }
         if (this.video.paused) {
             this.video.play().catch(e => console.warn('Play interrupted:', e));
         } else {
@@ -224,8 +235,18 @@ export class VideoController {
     }
 
     seekTo(time) {
-        const target = Math.max(0, Math.min(this.video.duration || 0, time));
-        this.video.currentTime = target;
+        const maxDuration = Math.max(
+            this.video.duration || 0,
+            state.videoDuration || 0,
+            (state.keyframes[state.keyframes.length - 1]?.time || 0) + 10,
+            60
+        );
+        const target = Math.max(0, Math.min(maxDuration, time));
+        if (this.video.src && this.video.readyState >= 1) {
+            try {
+                this.video.currentTime = target;
+            } catch (e) {}
+        }
         state.currentTime = target;
         this.updateTimeDisplay();
         this.drawPreviewFrame();
@@ -235,12 +256,14 @@ export class VideoController {
     stepFrames(deltaFrames) {
         this.video.pause();
         const frameTime = 1 / (state.fps || 30);
-        this.seekTo(this.video.currentTime + deltaFrames * frameTime);
+        const current = (this.video.src && this.video.readyState >= 1) ? this.video.currentTime : state.currentTime;
+        this.seekTo(current + deltaFrames * frameTime);
     }
 
     stepSeconds(deltaSec) {
         this.video.pause();
-        this.seekTo(this.video.currentTime + deltaSec);
+        const current = (this.video.src && this.video.readyState >= 1) ? this.video.currentTime : state.currentTime;
+        this.seekTo(current + deltaSec);
     }
 
     startFrameLoop() {
@@ -292,7 +315,8 @@ export class VideoController {
             this.currentTimeDisplay.textContent = this.formatTimecode(state.currentTime);
         }
         if (this.totalTimeDisplay) {
-            this.totalTimeDisplay.textContent = ' / ' + this.formatTimecode(state.videoDuration);
+            const duration = this.video.duration || state.videoDuration || (state.keyframes[state.keyframes.length - 1]?.time || 0);
+            this.totalTimeDisplay.textContent = ' / ' + this.formatTimecode(duration);
         }
     }
 
@@ -321,7 +345,7 @@ export class VideoController {
         const onPointerDown = (e) => {
             isDragging = true;
             startX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-            lastTime = this.video.currentTime;
+            lastTime = (this.video.src && this.video.readyState >= 1) ? this.video.currentTime : state.currentTime;
             this.video.pause();
             this.jogShuttle.style.background = '#222834';
             window.addEventListener('pointermove', onPointerMove);

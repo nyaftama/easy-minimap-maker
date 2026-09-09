@@ -8,7 +8,7 @@
  * - 最大10世代の Undo / Redo
  */
 
-import { state } from './state.js?v=1.01b';
+import { state } from './state.js?v=1.01c';
 
 export class TimelineEditor {
     constructor(videoController) {
@@ -78,6 +78,20 @@ export class TimelineEditor {
             this.updateDimensions();
             this.drawRuler();
         });
+
+        // ビューポートの可視化や寸法変化を即座に検知して再計算
+        if (typeof ResizeObserver !== 'undefined' && this.viewport) {
+            this.resizeObserver = new ResizeObserver((entries) => {
+                for (const entry of entries) {
+                    if (entry.contentRect.width > 0) {
+                        this.updateDimensions();
+                        this.drawRuler();
+                        this.updatePlayheadPosition();
+                    }
+                }
+            });
+            this.resizeObserver.observe(this.viewport);
+        }
     }
 
     bindState() {

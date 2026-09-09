@@ -7,15 +7,15 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=1.01bb';
-import { VideoController } from './video-controller.js?v=1.01bb';
-import { MapController } from './map-controller.js?v=1.01bb';
-import { TimelineEditor } from './timeline-editor.js?v=1.01bb';
-import { RenderEngine } from './render-engine.js?v=1.01bb';
-import { VideoExporter } from './video-exporter.js?v=1.01bb';
-import { ZipExporter } from './zip-exporter.js?v=1.01bb';
-import { CloudStorage } from './cloud-storage.js?v=1.01bb';
-import { saveOrShareFile } from './download-helper.js?v=1.01bb';
+import { state } from './state.js?v=1.01c';
+import { VideoController } from './video-controller.js?v=1.01c';
+import { MapController } from './map-controller.js?v=1.01c';
+import { TimelineEditor } from './timeline-editor.js?v=1.01c';
+import { RenderEngine } from './render-engine.js?v=1.01c';
+import { VideoExporter } from './video-exporter.js?v=1.01c';
+import { ZipExporter } from './zip-exporter.js?v=1.01c';
+import { CloudStorage } from './cloud-storage.js?v=1.01c';
+import { saveOrShareFile } from './download-helper.js?v=1.01c';
 
 class App {
     constructor() {
@@ -81,15 +81,30 @@ class App {
         this.updatePlaceholderVisibility();
 
         // 地図とタイムラインの描画領域を強制再計算
-        setTimeout(() => {
+        const refreshLayout = () => {
             if (this.mapController && this.mapController.map) {
                 this.mapController.map.invalidateSize();
-                this.mapController.fitBounds();
+                if (state.keyframes.length > 0) {
+                    this.mapController.fitBounds();
+                }
             }
-            this.timelineEditor.updateDimensions();
-            this.timelineEditor.drawRuler();
-            this.timelineEditor.renderTrackItems();
-        }, 150);
+            if (this.timelineEditor) {
+                this.timelineEditor.updateDimensions();
+                this.timelineEditor.drawRuler();
+                this.timelineEditor.renderTrackItems();
+                this.timelineEditor.updatePlayheadPosition();
+                this.timelineEditor.updatePauseButtonState();
+                this.timelineEditor.updateDeleteButton();
+            }
+            if (this.videoController) {
+                this.videoController.updateTimeDisplay();
+                this.videoController.updatePlayBtn();
+            }
+        };
+
+        refreshLayout();
+        requestAnimationFrame(refreshLayout);
+        setTimeout(refreshLayout, 100);
     }
 
     initStartScreen() {
@@ -243,10 +258,15 @@ class App {
             if (countSpan) countSpan.textContent = draft.keyframes.length;
 
             btnRestore.onclick = () => {
-                state.restoreDraft(draft);
-                const nameDisplay = document.getElementById('projectNameDisplay');
-                if (nameDisplay) nameDisplay.textContent = state.projectName;
-                this.showWorkspaceScreen();
+                try {
+                    this.showWorkspaceScreen();
+                    state.restoreDraft(draft);
+                    const nameDisplay = document.getElementById('projectNameDisplay');
+                    if (nameDisplay) nameDisplay.textContent = state.projectName;
+                } catch (err) {
+                    console.error('Failed to restore draft:', err);
+                    App.showModalAlert('下書きの復元に失敗しました: ' + err.message, 'エラー', 'warning');
+                }
             };
 
             btnDiscard.onclick = () => {
@@ -348,11 +368,11 @@ class App {
             reader.onload = (ev) => {
                 try {
                     const parsed = JSON.parse(ev.target.result);
+                    closeModal();
+                    this.showWorkspaceScreen();
                     state.restoreDraft(parsed);
                     const nameDisplay = document.getElementById('projectNameDisplay');
                     if (nameDisplay) nameDisplay.textContent = state.projectName;
-                    closeModal();
-                    this.showWorkspaceScreen();
                 } catch (err) {
                     App.showModalAlert('JSONファイルの読み込みに失敗しました: ' + err.message, 'エラー', 'warning');
                 }
@@ -1459,18 +1479,27 @@ class App {
                 throw new Error('プロジェクトデータが存在しません');
             }
 
-            state.restoreDraft(project.data);
-            const nameDisplay = document.getElementById('projectNameDisplay');
-            if (nameDisplay) nameDisplay.textContent = state.projectName;
+            let projectData = project.data;
+            if (typeof projectData === 'string') {
+                try {
+                    projectData = JSON.parse(projectData);
+                } catch (e) {
+                    console.error('Failed to parse project.data:', e);
+                }
+            }
 
             const modal = document.getElementById('cloudProjectsModal');
             modal?.classList.remove('open');
 
             this.showWorkspaceScreen();
+            state.restoreDraft(projectData);
+
+            const nameDisplay = document.getElementById('projectNameDisplay');
+            if (nameDisplay) nameDisplay.textContent = state.projectName;
 
             // 動画がまだロードされていない場合は案内
             if (!this.mainVideo.src || this.mainVideo.readyState === 0) {
-                const vName = project.data?.videoFileName ? `（元動画: ${project.data.videoFileName}）` : '';
+                const vName = projectData?.videoFileName ? `（元動画: ${projectData.videoFileName}）` : '';
                 App.showModalAlert(
                     `クラウドプロジェクト「${project.name}」を読み込みました。\n編集を再開するには動画ファイル${vName}を選択してください。`,
                     'プロジェクト読み込み完了',
