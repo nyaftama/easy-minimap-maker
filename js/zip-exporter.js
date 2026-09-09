@@ -3,7 +3,8 @@
  * GPX / GeoJSON / JSON 生成 & JSZip による一括ダウンロード
  */
 
-import { RouteInterpolator } from './interpolator.js?v=1.01';
+import { RouteInterpolator } from './interpolator.js?v=1.01a';
+import { saveOrShareFile } from './download-helper.js?v=1.01a';
 
 export class ZipExporter {
     /**
@@ -156,14 +157,8 @@ URL: https://nyaftama.github.io/easy-minimap-maker/
         const readmeData = this.generateReadme(projectName);
         zip.file('README.txt', readmeData);
 
-        // ZIP 生成 & ダウンロード
+        // ZIP 生成 & ダウンロード / 共有
         const zipBlob = await zip.generateAsync({ type: 'blob' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(zipBlob);
-        a.download = `${projectName}_assets.zip`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(a.href);
+        await saveOrShareFile(zipBlob, `${projectName}_assets.zip`, `${projectName} エクスポート素材`);
     }
 }

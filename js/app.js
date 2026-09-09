@@ -7,14 +7,15 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=1.01';
-import { VideoController } from './video-controller.js?v=1.01';
-import { MapController } from './map-controller.js?v=1.01';
-import { TimelineEditor } from './timeline-editor.js?v=1.01';
-import { RenderEngine } from './render-engine.js?v=1.01';
-import { VideoExporter } from './video-exporter.js?v=1.01';
-import { ZipExporter } from './zip-exporter.js?v=1.01';
-import { CloudStorage } from './cloud-storage.js?v=1.01';
+import { state } from './state.js?v=1.01a';
+import { VideoController } from './video-controller.js?v=1.01a';
+import { MapController } from './map-controller.js?v=1.01a';
+import { TimelineEditor } from './timeline-editor.js?v=1.01a';
+import { RenderEngine } from './render-engine.js?v=1.01a';
+import { VideoExporter } from './video-exporter.js?v=1.01a';
+import { ZipExporter } from './zip-exporter.js?v=1.01a';
+import { CloudStorage } from './cloud-storage.js?v=1.01a';
+import { saveOrShareFile } from './download-helper.js?v=1.01a';
 
 class App {
     constructor() {
@@ -508,11 +509,7 @@ class App {
                 previewQuality: state.previewQuality
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `${state.projectName}_data.json`;
-            a.click();
-            URL.revokeObjectURL(a.href);
+            saveOrShareFile(blob, `${state.projectName}_data.json`, `${state.projectName} 設定データ`);
         });
 
         // JSON インポート
@@ -785,14 +782,7 @@ class App {
                         const baseName = (state.projectName || 'minimap-project').trim().replace(/[/\\?%*:|"<>]/g, '_');
                         const ext = videoBlob.type.includes('mp4') ? 'mp4' : 'webm';
                         const filename = `${baseName}-wipe.${ext}`;
-                        const url = URL.createObjectURL(videoBlob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        setTimeout(() => URL.revokeObjectURL(url), 10000);
+                        saveOrShareFile(videoBlob, filename, `${baseName} ミニマップ動画素材`);
                     };
                 }
 
