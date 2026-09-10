@@ -3,7 +3,7 @@
  * 動画再生制御・フレーム移動・ジョグスクラバー・軽量プレビューレンダリング
  */
 
-import { state } from './state.js?v=1.01e';
+import { state } from './state.js?v=1.01f';
 
 export class VideoController {
     constructor(videoEl, options = {}) {

@@ -735,6 +735,30 @@ textarea {
     overflow: hidden;
 }
 
+.jog-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+}
+
+.jog-arrow.left {
+    left: 8px;
+}
+
+.jog-arrow.right {
+    right: 8px;
+}
+
+.jog-shuttle:hover .jog-arrow {
+    color: #94a3b8;
+}
+
 .jog-lines {
     display: flex;
     gap: 4px;
@@ -1606,6 +1630,19 @@ textarea {
     .workspace-top.mobile-side-by-side .jog-shuttle {
         max-width: 70px !important;
         height: 24px !important;
+    }
+
+    .workspace-top.mobile-side-by-side .jog-arrow {
+        width: 10px;
+        height: 10px;
+    }
+
+    .workspace-top.mobile-side-by-side .jog-arrow.left {
+        left: 3px;
+    }
+
+    .workspace-top.mobile-side-by-side .jog-arrow.right {
+        right: 3px;
     }
 
     .workspace-top.mobile-side-by-side .video-step-controls {

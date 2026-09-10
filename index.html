@@ -35,8 +35,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
     <!-- Application CSS -->
-    <link rel="stylesheet" href="css/style.css?v=1.01e">
-    <link rel="stylesheet" href="css/timeline.css?v=1.01e">
+    <link rel="stylesheet" href="css/style.css?v=1.01f">
+    <link rel="stylesheet" href="css/timeline.css?v=1.01f">
 </head>
 
 <body>
@@ -617,6 +617,9 @@
 
                     <!-- ジョグダイヤル・スクラバー -->
                     <div class="jog-shuttle" id="jogShuttle" title="ドラッグで滑らかに前後スクラブ">
+                        <svg class="jog-arrow left" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
                         <div class="jog-lines">
                             <span class="jog-line"></span>
                             <span class="jog-line"></span>
@@ -627,6 +630,9 @@
                             <span class="jog-line"></span>
                         </div>
                         <span class="jog-label">JOG SCRUB</span>
+                        <svg class="jog-arrow right" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
                     </div>
 
                     <!-- ステップ操作ボタン群 -->
@@ -1460,7 +1466,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- アプリケーションモジュール -->
-    <script type="module" src="js/app.js?v=1.01e"></script>
+    <script type="module" src="js/app.js?v=1.01f"></script>
     <!-- トースト通知 -->
     <div id="vrmToast" class="vrm-toast">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

@@ -7,7 +7,7 @@
  * - 一時停止作成中の自動保存保留と完了時の即時保存
  */
 
-export const APP_VERSION = '1.01e';
+export const APP_VERSION = '1.01f';
 const STORAGE_KEY = 'vrm_draft_project_v1';
 
 class ProjectState {

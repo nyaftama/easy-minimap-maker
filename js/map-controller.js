@@ -8,9 +8,9 @@
  * - ピン近傍ポップアップ (削除 / 現在時刻にコピー追加 / 時刻ジャンプ)
  */
 
-import { state } from './state.js?v=1.01e';
-import { RouteInterpolator } from './interpolator.js?v=1.01e';
-import { MapSearch } from './map-search.js?v=1.01e';
+import { state } from './state.js?v=1.01f';
+import { RouteInterpolator } from './interpolator.js?v=1.01f';
+import { MapSearch } from './map-search.js?v=1.01f';
 
 export class MapController {
     constructor(containerId = 'leafletMap') {
