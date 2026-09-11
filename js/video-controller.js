@@ -3,7 +3,7 @@
  * 動画再生制御・フレーム移動・ジョグスクラバー・軽量プレビューレンダリング
  */
 
-import { state } from './state.js?v=1.01f';
+import { state } from './state.js?v=1.02';
 
 export class VideoController {
     constructor(videoEl, options = {}) {
@@ -94,8 +94,43 @@ export class VideoController {
             state.videoDuration = this.video.duration;
             this.updateTimeDisplay();
             this.applyQualityMode();
-            this.drawPreviewFrame();
+
+            // 読み込み直後の先頭フレームのデコードと描画を確実に促す
+            // ブラウザ（SafariやChrome等）によっては、再生するか微小シークするまで
+            // 先頭フレームの画像データがデコードされず黒画面になるため、微小シーク（0.001秒）を実行して0秒に戻す
+            const seekDelta = Math.min(0.001, (this.video.duration || 1) / 2);
+            if (this.video.currentTime === 0 && seekDelta > 0) {
+                try {
+                    this.video.currentTime = seekDelta;
+                    const onInitialSeek = () => {
+                        this.video.removeEventListener('seeked', onInitialSeek);
+                        this.video.currentTime = 0;
+                        this.drawPreviewFrame();
+                    };
+                    this.video.addEventListener('seeked', onInitialSeek, { once: true });
+                } catch (e) {
+                    this.drawPreviewFrame();
+                }
+            } else {
+                this.drawPreviewFrame();
+            }
+
             state.notify('video_loaded', { duration: this.video.duration });
+        });
+
+        // 現在フレームのデータ読み込み完了
+        this.video.addEventListener('loadeddata', () => {
+            this.drawPreviewFrame();
+        });
+
+        // 再生準備完了
+        this.video.addEventListener('canplay', () => {
+            this.drawPreviewFrame();
+        });
+
+        // シーク完了
+        this.video.addEventListener('seeked', () => {
+            this.drawPreviewFrame();
         });
 
         // 再生 / 一時停止状態

@@ -7,15 +7,16 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=1.01f';
-import { VideoController } from './video-controller.js?v=1.01f';
-import { MapController } from './map-controller.js?v=1.01f';
-import { TimelineEditor } from './timeline-editor.js?v=1.01f';
-import { RenderEngine } from './render-engine.js?v=1.01f';
-import { VideoExporter } from './video-exporter.js?v=1.01f';
-import { ZipExporter } from './zip-exporter.js?v=1.01f';
-import { CloudStorage } from './cloud-storage.js?v=1.01f';
-import { saveOrShareFile } from './download-helper.js?v=1.01f';
+import { state } from './state.js?v=1.02';
+import { VideoController } from './video-controller.js?v=1.02';
+import { MapController } from './map-controller.js?v=1.02';
+import { TimelineEditor } from './timeline-editor.js?v=1.02';
+import { RenderEngine } from './render-engine.js?v=1.02';
+import { VideoExporter } from './video-exporter.js?v=1.02';
+import { ZipExporter } from './zip-exporter.js?v=1.02';
+import { CloudStorage } from './cloud-storage.js?v=1.02';
+import { saveOrShareFile } from './download-helper.js?v=1.02';
+import { TutorialModal } from './tutorial-modal.js?v=1.02';
 
 class App {
     constructor() {
@@ -53,6 +54,7 @@ class App {
         this.initWorkspacePlaceholder();
         this.initWorkspaceHeader();
         this.initMobileMenu();
+        this.initTutorialModal();
         this.initSettingsModal();
         this.initExportModal();
         this.initAuth();
@@ -431,6 +433,11 @@ class App {
             document.getElementById('btnNewProject')?.click();
         });
 
+        document.getElementById('btnMobileTutorial')?.addEventListener('click', () => {
+            closeMenu();
+            this.tutorialModal?.open();
+        });
+
         // ログイン / ログアウト操作
         const handleAuthAction = async () => {
             closeMenu();
@@ -476,6 +483,24 @@ class App {
                 state.resetProject();
                 this.showStartScreen();
             }
+        });
+    }
+
+    // ============================================================
+    // チュートリアルモーダル（使い方ガイド）
+    // ============================================================
+
+    initTutorialModal() {
+        this.tutorialModal = new TutorialModal();
+
+        // スタート画面の「使い方ガイド」ボタン
+        document.getElementById('btnStartOpenTutorial')?.addEventListener('click', () => {
+            this.tutorialModal?.open();
+        });
+
+        // ワークスペース画面の「ヘルプ」ボタン
+        document.getElementById('btnWsOpenTutorial')?.addEventListener('click', () => {
+            this.tutorialModal?.open();
         });
     }
 

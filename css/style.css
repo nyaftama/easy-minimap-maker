@@ -3237,3 +3237,207 @@ button:disabled,
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* ============================================================
+   チュートリアルモーダル（使い方ガイド）
+   ============================================================ */
+.modal-content.tutorial-modal-content {
+    max-width: 560px;
+    width: 94%;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    background: #141820;
+    color: var(--text-light);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.tutorial-modal-content .modal-header {
+    background: #141820;
+    border-bottom: 1px solid var(--border-dark);
+    padding: 14px 20px;
+}
+
+.tutorial-modal-content .modal-title {
+    color: #f1f5f9;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.tutorial-modal-content .modal-title svg {
+    color: #60a5fa;
+}
+
+.tutorial-modal-content .btn-close {
+    color: #94a3b8;
+}
+
+.tutorial-modal-content .btn-close:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.tutorial-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tutorial-page-counter {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-weight: 600;
+}
+
+.tutorial-modal-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+}
+
+/* 正方形画像フレーム (1:1) */
+.tutorial-image-frame {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 1 / 1;
+    background: radial-gradient(circle at 50% 45%, #1a2332 0%, #0c1017 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    position: relative;
+}
+
+.tutorial-image-frame img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* テキスト解説エリア */
+.tutorial-text-area {
+    width: 100%;
+    max-width: 440px;
+    text-align: center;
+}
+
+.tutorial-step-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    padding: 2px 10px;
+    border-radius: 9999px;
+    margin-bottom: 6px;
+    letter-spacing: 0.06em;
+}
+
+.tutorial-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.tutorial-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #94a3b8;
+    text-align: left;
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+/* フッターナビゲーション */
+.tutorial-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border-dark);
+    background: #10141c;
+}
+
+.tutorial-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tutorial-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #334155;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.tutorial-dot:hover {
+    background: #64748b;
+}
+
+.tutorial-dot.active {
+    background: #3b82f6;
+    transform: scale(1.3);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+}
+
+@media (max-width: 600px) {
+    .modal-content.tutorial-modal-content {
+        width: 96%;
+        max-height: 94vh;
+    }
+    .tutorial-modal-body {
+        padding: 12px 12px 8px;
+        gap: 10px;
+    }
+    .tutorial-image-frame {
+        max-width: 100%;
+        padding: 8px;
+    }
+    .tutorial-title {
+        font-size: 14px;
+    }
+    .tutorial-desc {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+    .tutorial-modal-footer {
+        padding: 10px 12px;
+    }
+    .tutorial-dot {
+        width: 6px;
+        height: 6px;
+    }
+}

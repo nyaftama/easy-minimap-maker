@@ -35,8 +35,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
     <!-- Application CSS -->
-    <link rel="stylesheet" href="css/style.css?v=1.01f">
-    <link rel="stylesheet" href="css/timeline.css?v=1.01f">
+    <link rel="stylesheet" href="css/style.css?v=1.02">
+    <link rel="stylesheet" href="css/timeline.css?v=1.02">
 </head>
 
 <body>
@@ -82,7 +82,7 @@
             <!-- Header Meta -->
             <div class="header-meta">
                 <div class="version-group">
-                    <span class="version-badge">v1.01</span>
+                    <span class="version-badge">v1.02</span>
                     <a href="https://github.com/nyaftama/easy-minimap-maker" target="_blank" rel="noopener noreferrer"
                         class="changelog-link">GitHub</a>
                 </div>
@@ -189,7 +189,7 @@
                     </button>
                 </div>
 
-                <!-- プロジェクト読み込み -->
+                <!-- プロジェクト読み込み & 使い方ガイド -->
                 <div class="start-project-open-actions">
                     <button type="button" id="btnStartOpenProjectModal" class="btn btn-secondary">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -199,7 +199,16 @@
                             <line x1="12" y1="18" x2="12" y2="12"></line>
                             <line x1="9" y1="15" x2="15" y2="15"></line>
                         </svg>
-                        <span>プロジェクトを開く...</span>
+                        <span>プロジェクトを開く</span>
+                    </button>
+                    <button type="button" id="btnStartOpenTutorial" class="btn btn-secondary">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        <span>使い方ガイド</span>
                     </button>
                 </div>
             </div>
@@ -414,6 +423,15 @@
                     </svg>
                     <span>保存</span>
                 </button>
+                <button type="button" id="btnWsOpenTutorial" class="btn btn-secondary btn-sm" title="使い方ガイド (?)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>使い方</span>
+                </button>
                 <button type="button" id="btnOpenSettings" class="btn btn-secondary btn-sm" title="設定">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -528,6 +546,15 @@
                         </svg>
                         <span>クラウドプロジェクト一覧</span>
                     </button>
+                    <button type="button" id="btnMobileTutorial" class="ws-mobile-menu-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        <span>使い方ガイド</span>
+                    </button>
                     <button type="button" id="btnMobileSettings" class="ws-mobile-menu-item">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -617,7 +644,8 @@
 
                     <!-- ジョグダイヤル・スクラバー -->
                     <div class="jog-shuttle" id="jogShuttle" title="ドラッグで滑らかに前後スクラブ">
-                        <svg class="jog-arrow left" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="jog-arrow left" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="15 18 9 12 15 6"></polyline>
                         </svg>
                         <div class="jog-lines">
@@ -630,7 +658,8 @@
                             <span class="jog-line"></span>
                         </div>
                         <span class="jog-label">JOG SCRUB</span>
-                        <svg class="jog-arrow right" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="jog-arrow right" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
                     </div>
@@ -1126,6 +1155,74 @@
 
 
     <!-- ============================================================
+         チュートリアルモーダル（使い方ガイド）
+         ============================================================ -->
+    <div id="tutorialModal" class="modal-backdrop">
+        <div class="modal-content tutorial-modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>使い方ガイド</span>
+                </h3>
+                <div class="tutorial-header-right">
+                    <span id="tutorialPageCounter" class="tutorial-page-counter">1 / 8</span>
+                    <button type="button" class="btn-close" id="btnCloseTutorialModal" aria-label="閉じる">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-body tutorial-modal-body">
+                <!-- 正方形画像フレーム (1:1) -->
+                <div class="tutorial-image-frame">
+                    <img id="tutorialStepImg" src="img/tutorial/tutorial-step1-load.png" alt="チュートリアル画像">
+                </div>
+
+                <!-- テキスト解説エリア -->
+                <div class="tutorial-text-area">
+                    <span id="tutorialStepTag" class="tutorial-step-tag">STEP 1</span>
+                    <h4 id="tutorialStepTitle" class="tutorial-title">動画ファイルを読み込む</h4>
+                    <p id="tutorialStepDesc" class="tutorial-desc">
+                        スタート画面のドロップエリアに、街歩きやドライブの動画（MP4, MOV,
+                        WebM）をドラッグ＆ドロップまたはファイル選択で指定します。動画データは外部サーバーへ送信されず、端末内（ブラウザ）でのみ安全に処理されます。
+                    </p>
+                </div>
+            </div>
+
+            <div class="modal-footer tutorial-modal-footer">
+                <button type="button" id="btnTutorialPrev" class="btn btn-secondary btn-sm" disabled>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    <span>前へ</span>
+                </button>
+
+                <!-- ドットインジケーター -->
+                <div id="tutorialDots" class="tutorial-dots"></div>
+
+                <button type="button" id="btnTutorialNext" class="btn btn-primary btn-sm">
+                    <span>次へ</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ============================================================
          プロジェクト設定モーダル
          ============================================================ -->
     <div id="settingsModal" class="modal-backdrop">
@@ -1466,7 +1563,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- アプリケーションモジュール -->
-    <script type="module" src="js/app.js?v=1.01f"></script>
+    <script type="module" src="js/app.js?v=1.02"></script>
     <!-- トースト通知 -->
     <div id="vrmToast" class="vrm-toast">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
