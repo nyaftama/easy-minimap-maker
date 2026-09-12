@@ -7,16 +7,16 @@
  * - モバイル端末でのボタン状態リセット
  */
 
-import { state } from './state.js?v=1.02';
-import { VideoController } from './video-controller.js?v=1.02';
-import { MapController } from './map-controller.js?v=1.02';
-import { TimelineEditor } from './timeline-editor.js?v=1.02';
-import { RenderEngine } from './render-engine.js?v=1.02';
-import { VideoExporter } from './video-exporter.js?v=1.02';
-import { ZipExporter } from './zip-exporter.js?v=1.02';
-import { CloudStorage } from './cloud-storage.js?v=1.02';
-import { saveOrShareFile } from './download-helper.js?v=1.02';
-import { TutorialModal } from './tutorial-modal.js?v=1.02';
+import { state } from './state.js?v=1.02a';
+import { VideoController } from './video-controller.js?v=1.02a';
+import { MapController } from './map-controller.js?v=1.02a';
+import { TimelineEditor } from './timeline-editor.js?v=1.02a';
+import { RenderEngine } from './render-engine.js?v=1.02a';
+import { VideoExporter } from './video-exporter.js?v=1.02a';
+import { ZipExporter } from './zip-exporter.js?v=1.02a';
+import { CloudStorage } from './cloud-storage.js?v=1.02a';
+import { saveOrShareFile } from './download-helper.js?v=1.02a';
+import { TutorialModal } from './tutorial-modal.js?v=1.02a';
 
 class App {
     constructor() {

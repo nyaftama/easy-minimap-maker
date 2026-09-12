@@ -3309,11 +3309,11 @@ button:disabled,
     flex: 1;
 }
 
-/* 正方形画像フレーム (1:1) */
+/* 画像フレーム (3:2) */
 .tutorial-image-frame {
     width: 100%;
     max-width: 400px;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 3 / 2;
     background: radial-gradient(circle at 50% 45%, #1a2332 0%, #0c1017 100%);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
@@ -3414,23 +3414,32 @@ button:disabled,
 }
 
 @media (max-width: 600px) {
+    #tutorialModal {
+        height: 100vh;
+        height: 100svh;
+    }
     .modal-content.tutorial-modal-content {
         width: 96%;
-        max-height: 94vh;
+        max-height: 100vh;
+        max-height: 100svh;
+        border-radius: var(--radius-md);
     }
     .tutorial-modal-body {
-        padding: 12px 12px 8px;
-        gap: 10px;
+        padding: 10px 12px 8px;
+        gap: 8px;
     }
     .tutorial-image-frame {
         max-width: 100%;
-        padding: 8px;
+        aspect-ratio: 3 / 2;
+        padding: 6px;
     }
     .tutorial-title {
         font-size: 14px;
+        margin-bottom: 6px;
     }
     .tutorial-desc {
         font-size: 12px;
+        line-height: 1.5;
         padding: 8px 10px;
     }
     .tutorial-modal-footer {
